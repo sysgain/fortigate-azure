@@ -1,0 +1,210 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "adminuser",
+            "metadata": {
+                "description": "Username for fortigate Virtual Machine, make a note of the Username this will be used further"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "Password@1234",
+            "metadata": {
+                "description": "Password for fortigate Virtual Machine,make a note of the Password this will be used further."
+            }
+        },
+        "fortigateVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS1_v2",
+            "metadata": {
+                "description": "fortigate Virtual Machine size"
+            }
+        }
+    },
+    "variables": {
+        "apiVersions": {
+            "deploymentApiVersion": "2016-02-01",
+            "computeApiVersion": "2018-06-01",
+            "networkApiVersion": "2017-09-01",
+            "routtableApiVersion": "2015-06-15"
+
+        },
+        "networkSettings": {
+            "location": "[variables('location')]",
+            "networkApiVersion": "2016-03-30",
+            "virtualNetworkName": "ForiGateVNET",
+            "addressPrefix": "10.0.0.0/16",
+            "subnet1Name": "PublicFacingSubnet",
+            "subnet1Prefix": "10.0.0.0/24",
+            "subnet2Name": "InternalSubnet",
+            "subnet2Prefix": "10.0.1.0/24"
+        },
+        "wlNetworkSettings": {
+            "location": "[variables('location')]",
+            "networkApiVersion": "2016-03-30",
+            "virtualNetworkName": "workLoadsVNET",
+            "addressPrefix": "10.1.0.0/16",
+            "subnetName": "wlSubnet",
+            "subnetPrefix": "10.1.0.0/24",
+            "wl1_privateIP": "10.1.0.4",
+            "wl2_privateIP": "10.1.0.5"
+        },
+        "fortigateFirewallSettings": {
+            "location": "[variables('location')]",
+            "fortiAvailName": "forti-avset",
+            "FGPubFacingAddress": "10.0.0.4",
+            "FGDMZAddress": "10.0.1.4",
+            "fortiPublicIPAddressName": "forti-pip",
+            "publicIPAddressType": "Dynamic",
+            "FortiGateName": "[concat('fortigate',variables('suffix'))]",
+            "fortiNicName1": "forti-nic1",
+            "fortiNicName2": "forti-nic2",
+            "sku": "fortinet_fg-vm_payg",
+            "version": "latest",
+            "product": "fortinet_fortigate-vm_v5",
+            "publisher": "fortinet",
+            "fortigateVMSize": "[parameters('fortigateVMSize')]",
+            "storageAccountType": "Standard_LRS",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "fortiDnsLabelPrefix": "[concat('fortigate',variables('suffix'))]",
+            "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
+            "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
+            "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]"
+        },
+        "workloadsSettings": {
+            "location": "[variables('location')]",
+            "virtualMachineName": "workload",
+            "publicIPdnsPrefix": "[concat('webgoat1',variables('suffix'))]",
+            "vmCount": 2,
+            "adminUsername": "adminuser",
+            "adminPassword": "Password@1234",
+            "nicName": "wl-vnic",
+            "networkSecurityGroupName": "webGoat-nsg",
+            "publicIpAddressName": "workload-pip",
+            "publicIpAddressType": "Static",
+            "vmSize": "Standard_DS1_v2",
+            "osPublisher": "Canonical",
+            "osOffer": "UbuntuServer",
+            "osSku": "16.04-LTS",
+            "storageAccountType": "Premium_LRS",
+            "extName": "webgoatsetup",
+            "extName2": "webgoatsetup2",
+            "scriptUrl": "[concat(variables('baseUrl'),'webgoat.sh')]",
+            "routeTableName":"WorkloadRoute",
+            "nextHopIPAddress":"10.1.0.4"
+        },
+        "location": "[resourceGroup().location]",
+        "deploymentApiVersion": "2016-02-01",
+        "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
+        "baseUrl": "https://raw.githubusercontent.com/pradeepts/fortigate-azure/master/"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "vnetPeering",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'), 'nested/vnetpeering.json?token=AT2LgAAEhRqZrXxOaNs0I40oKlFXEKX5ks5cpJxJwA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },
+                   
+                    "wlNetworkSettings": {
+                        "value": "[variables('wlNetworkSettings')]"
+                    },
+                    "fortigateFirewallSettings": {
+                        "value": "[variables('fortigateFirewallSettings')]"
+                    },
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    },
+                    "workloadsSettings":{
+                        "value":"[variables('workloadsSettings')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "fortigateServer",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "dependsOn": [
+                "vnetpeering"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgPrQccbQ_b4yesHmPJ70lLukYXJqks5cpJxHwA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "fortigateFirewallSettings": {
+                        "value": "[variables('fortigateFirewallSettings')]"
+                    },
+                  
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },
+                  
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "workloadservers",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "dependsOn": [
+                "vnetpeering"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgJAiXAlEywrjdUOXzcHKNwjdq60Dks5cpJxKwA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },
+                   
+                    "wlNetworkSettings": {
+                        "value": "[variables('wlNetworkSettings')]"
+                    },
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "fortigateWebURL": {
+            "type": "string",
+            "value": "[concat('https://',reference('fortigateServer').outputs.fortigateFQDN.value)]"
+        },
+        "webUIAdminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        },
+        "webUIAdminPassword": {
+            "type": "string",
+            "value": "[parameters('adminPassword')]"
+        },
+        "workload_URL": {
+            "type": "string",
+            "value": "[concat('http://',reference('workloadservers').outputs.workloadFQDN1.value,':8080/WebGoat')]"
+        }
+    }
+}
