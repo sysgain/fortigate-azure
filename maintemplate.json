@@ -48,9 +48,7 @@
             "virtualNetworkName": "workLoadsVNET",
             "addressPrefix": "10.1.0.0/16",
             "subnetName": "wlSubnet",
-            "subnetPrefix": "10.1.0.0/24",
-            "wl1_privateIP": "10.1.0.4",
-            "wl2_privateIP": "10.1.0.5"
+            "subnetPrefix": "10.1.0.0/24"
         },
         "fortigateFirewallSettings": {
             "location": "[variables('location')]",
@@ -71,8 +69,8 @@
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "fortiDnsLabelPrefix": "[concat('fortigate',variables('suffix'))]",
-            "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
-            "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
+            "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
+            "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
             "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]"
         },
         "workloadsSettings": {
@@ -80,27 +78,43 @@
             "virtualMachineName": "workload",
             "publicIPdnsPrefix": "[concat('webgoat1',variables('suffix'))]",
             "vmCount": 2,
-            "adminUsername": "adminuser",
-            "adminPassword": "Password@1234",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
             "nicName": "wl-vnic",
-            "networkSecurityGroupName": "webGoat-nsg",
+            "networkSecurityGroupName": "workload-nsg",
             "publicIpAddressName": "workload-pip",
             "publicIpAddressType": "Static",
             "vmSize": "Standard_DS1_v2",
             "osPublisher": "Canonical",
             "osOffer": "UbuntuServer",
             "osSku": "16.04-LTS",
-            "storageAccountType": "Premium_LRS",
-            "extName": "webgoatsetup",
-            "extName2": "webgoatsetup2",
-            "scriptUrl": "[concat(variables('baseUrl'),'webgoat.sh')]",
-            "routeTableName":"WorkloadRoute",
-            "nextHopIPAddress":"10.1.0.4"
+            "storageAccountType": "Standard_LRS",
+            "scriptUrl": "[concat(variables('baseUrl'),'scripts/test.sh?token=AT2LgCDCdFQVly3JBrOzrF1t07SFHsy4ks5crdzGwA%3D%3D')]",
+            "routeTableName":"WorkloadRoute"
+        },
+        "EndUserVMSettings": {
+            "vnetName": "enduservnet",
+            "subnetName": "endusersubnet",
+            "addressPrefix": "10.2.0.0/16",
+            "subnetPrefix": "10.2.1.0/24",
+            "pipName": "[concat('enduserpip',variables('suffix'))]",
+            "publicIPAddressType": "Dynamic",
+            "nsgName":"[concat('endusernsg',variables('suffix'))]",
+            "dnsLabelPrefix": "[concat('enduserdns',variables('suffix'))]",
+            "location": "[variables('location')]",
+            "nicName": "enduser-nic",
+            "VmName": "ENDUSERVM",
+            "vmSize": "Standard_D2s_v3",
+            "Username": "[parameters('adminUsername')]",
+            "Password": "[parameters('adminPassword')]",
+            "imagePublisher": "Canonical",
+            "imageOffer": "UbuntuServer",
+            "ubuntuOSVersion": "18.04-LTS"
         },
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
-        "baseUrl": "https://raw.githubusercontent.com/pradeepts/fortigate-azure/master/"
+        "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
     "resources": [
         {
@@ -110,7 +124,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'), 'nested/vnetpeering.json?token=AT2LgAAEhRqZrXxOaNs0I40oKlFXEKX5ks5cpJxJwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AT2LgEr4fHF5TbFT25LUq0J_fm0t4Hm8ks5crdzCwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -143,7 +157,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgPrQccbQ_b4yesHmPJ70lLukYXJqks5cpJxHwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgHyh0ORXNsuo6tWCQvDpJzumuwZIks5crdzBwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -171,7 +185,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgJAiXAlEywrjdUOXzcHKNwjdq60Dks5cpJxKwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgOtywn2Sxa0EG1_XXVH8PCesF_XNks5crdzEwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -184,6 +198,23 @@
                     },
                     "apiVersions": {
                         "value": "[variables('apiVersions')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "EndUserVM",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AT2LgAj3C_2wn9tvSkcmtSPxv0FUMMyqks5creLGwA%3D%3D')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "EndUserVMSettings":{
+                        "value":"[variables('EndUserVMSettings')]"
                     }
                 }
             }
