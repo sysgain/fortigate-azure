@@ -76,8 +76,7 @@
         "workloadsSettings": {
             "location": "[variables('location')]",
             "virtualMachineName": "workload",
-            "publicIPdnsPrefix": "[concat('webgoat1',variables('suffix'))]",
-            "vmCount": 2,
+            "publicIPdnsPrefix": "[concat('webgoat1',variables('suffix'))]",        
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "nicName": "wl-vnic",
