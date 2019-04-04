@@ -134,6 +134,9 @@
                         }
                     }
                 ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('fortigateFirewallSettings').networkSecurityGroupName)]"
+                },
                 "enableIPForwarding": true
             }
         },
@@ -158,6 +161,9 @@
                         }
                     }
                 ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('fortigateFirewallSettings').networkSecurityGroupName)]"
+                },
                 "enableIPForwarding": true
             }
         },
