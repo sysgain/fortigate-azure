@@ -89,6 +89,7 @@
             "osOffer": "UbuntuServer",
             "osSku": "16.04-LTS",
             "storageAccountType": "Standard_LRS",
+            "extName": "workloadtest",
             "scriptUrl": "[concat(variables('baseUrl'),'scripts/test.sh?token=AT2LgCDCdFQVly3JBrOzrF1t07SFHsy4ks5crdzGwA%3D%3D')]",
             "routeTableName":"WorkloadRoute"
         },
