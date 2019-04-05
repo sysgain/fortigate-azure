@@ -4,14 +4,14 @@
     "parameters": {
         "adminUsername": {
             "type": "string",
-            "defaultValue": "adminuser",
+            "defaultValue": "",
             "metadata": {
                 "description": "Username for fortigate Virtual Machine, make a note of the Username this will be used further"
             }
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "Password@1234",
+            "defaultValue": "",
             "metadata": {
                 "description": "Password for fortigate Virtual Machine,make a note of the Password this will be used further."
             }
@@ -22,6 +22,41 @@
             "metadata": {
                 "description": "fortigate Virtual Machine size"
             }
+        },
+        "tenantID":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"provide your tenanad id detailes"
+            }
+        },
+        "clientID":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"Provide application ID of the service Principle"
+            }
+        },
+        "ClientSecrete":{
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description":"Provide Password of the service principle"
+            }
+        },
+        "subscriptionID":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"provide your subscription id"
+            }
+        },
+        "sdnAddressName":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"provide the name of teh sdn address"
+            }
         }
     },
     "variables": {
@@ -30,7 +65,6 @@
             "computeApiVersion": "2018-06-01",
             "networkApiVersion": "2017-09-01",
             "routtableApiVersion": "2015-06-15"
-
         },
         "networkSettings": {
             "location": "[variables('location')]",
@@ -46,22 +80,22 @@
             "location": "[variables('location')]",
             "networkApiVersion": "2016-03-30",
             "virtualNetworkName": "workLoadsVNET",
-            "addressPrefix": "10.1.0.0/16",
+            "addressPrefix": "172.1.0.0/16",
             "subnetName": "wlSubnet",
-            "subnetPrefix": "10.1.0.0/24"
+            "subnetPrefix": "172.1.0.0/24"
         },
         "fortigateFirewallSettings": {
             "location": "[variables('location')]",
             "fortiAvailName": "forti-avset",
             "FGPubFacingAddress": "10.0.0.4",
             "FGDMZAddress": "10.0.1.4",
-            "fortiPublicIPAddressName": "forti-pip",
+            "fortiPublicIPAddressName": "[concat('forti-pip',variables('suffix'))]",
             "publicIPAddressType": "Dynamic",
             "FortiGateName": "[concat('fortigate',variables('suffix'))]",
             "fortiNicName1": "forti-nic1",
             "fortiNicName2": "forti-nic2",
             "sku": "fortinet_fg-vm_payg",
-            "version": "latest",
+            "version": "6.0.4",
             "product": "fortinet_fortigate-vm_v5",
             "publisher": "fortinet",
             "fortigateVMSize": "[parameters('fortigateVMSize')]",
@@ -71,12 +105,13 @@
             "fortiDnsLabelPrefix": "[concat('fortigate',variables('suffix'))]",
             "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
             "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
-            "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]"
+            "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]",
+            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecrete'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('sdnAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end')]"
         },
         "workloadsSettings": {
             "location": "[variables('location')]",
             "virtualMachineName": "workload",
-            "publicIPdnsPrefix": "[concat('webgoat1',variables('suffix'))]",        
+            "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "nicName": "wl-vnic",
@@ -88,15 +123,13 @@
             "osOffer": "UbuntuServer",
             "osSku": "16.04-LTS",
             "storageAccountType": "Standard_LRS",
-            "extName": "workloadtest",
-            "scriptUrl": "[concat(variables('baseUrl'),'scripts/test.sh?token=AT2LgCDCdFQVly3JBrOzrF1t07SFHsy4ks5crdzGwA%3D%3D')]",
             "routeTableName":"WorkloadRoute"
         },
         "EndUserVMSettings": {
             "vnetName": "enduservnet",
             "subnetName": "endusersubnet",
-            "addressPrefix": "10.2.0.0/16",
-            "subnetPrefix": "10.2.1.0/24",
+            "addressPrefix": "10.5.0.0/16",
+            "subnetPrefix": "10.5.1.0/24",
             "pipName": "[concat('enduserpip',variables('suffix'))]",
             "publicIPAddressType": "Dynamic",
             "nsgName":"[concat('endusernsg',variables('suffix'))]",
@@ -104,7 +137,7 @@
             "location": "[variables('location')]",
             "nicName": "enduser-nic",
             "VmName": "ENDUSERVM",
-            "vmSize": "Standard_D2s_v3",
+            "vmSize": "Standard_DS1_v2",
             "Username": "[parameters('adminUsername')]",
             "Password": "[parameters('adminPassword')]",
             "imagePublisher": "Canonical",
@@ -114,6 +147,7 @@
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
+        "rgName":"[resourceGroup().name]",
         "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
     "resources": [
@@ -124,14 +158,13 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AT2LgEr4fHF5TbFT25LUq0J_fm0t4Hm8ks5crdzCwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AT2LgP3Zk2WWVALHA-nBWet0deVKbGvgks5csKdhwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "networkSettings": {
                         "value": "[variables('networkSettings')]"
-                    },
-                   
+                    },                 
                     "wlNetworkSettings": {
                         "value": "[variables('wlNetworkSettings')]"
                     },
@@ -157,18 +190,16 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgHyh0ORXNsuo6tWCQvDpJzumuwZIks5crdzBwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgITX-qHhpyhdOt7bbzBmFLjnV0RFks5csKnMwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "fortigateFirewallSettings": {
                         "value": "[variables('fortigateFirewallSettings')]"
-                    },
-                  
+                    },                 
                     "networkSettings": {
                         "value": "[variables('networkSettings')]"
-                    },
-                  
+                    },                 
                     "apiVersions": {
                         "value": "[variables('apiVersions')]"
                     }
@@ -185,14 +216,13 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgOtywn2Sxa0EG1_XXVH8PCesF_XNks5crdzEwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgIRsqTcJ_Wn3UePG40nfN1UL4uVbks5csKdjwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "workloadsSettings": {
                         "value": "[variables('workloadsSettings')]"
-                    },
-                   
+                    },   
                     "wlNetworkSettings": {
                         "value": "[variables('wlNetworkSettings')]"
                     },
@@ -209,7 +239,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AT2LgAj3C_2wn9tvSkcmtSPxv0FUMMyqks5creLGwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AT2LgG5vhjUfQC7KbyJI-3DpyNHKG0uWks5csKddwA%3D%3D')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -235,7 +265,7 @@
         },
         "workload_URL": {
             "type": "string",
-            "value": "[concat('http://',reference('workloadservers').outputs.workloadFQDN1.value,':8080/WebGoat')]"
+            "value": "[concat('http://',reference('workloadservers').outputs.workloadFQDN.value)]"
         }
     }
 }
