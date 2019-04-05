@@ -164,32 +164,10 @@
                     ]
                 }
             }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('workloadsSettings').virtualMachineName,'/',parameters('workloadsSettings').extName)]",
-            "apiVersion": "[parameters('apiVersions').computeApiVersion]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "[parameters('workloadsSettings').scriptUrl]"
-                    ],
-                    "commandToExecute": "sh test.sh"
-                }
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/',parameters('workloadsSettings').virtualMachineName)]"
-            ]
-        }
-       
+        }       
     ],
     "outputs": {
-        "workloadFQDN1": {
+        "workloadFQDN": {
             "type": "string",
             "value": "[reference(concat(parameters('workloadsSettings').publicIpAddressName)).dnsSettings.fqdn]"
         }
