@@ -122,13 +122,15 @@
                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
                 }
             }
-        },
-        
+        },   
         {
             "apiVersion": "[parameters('apiVersions').computeApiVersion]",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat(parameters('workloadsSettings').virtualMachineName)]",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "web"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName))]"
             ],
