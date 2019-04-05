@@ -123,7 +123,7 @@
                     "computerName": "[parameters('fortigateFirewallSettings').FortiGateName]",
                     "adminUsername": "[parameters('fortigateFirewallSettings').adminUsername]",
                     "adminPassword": "[parameters('fortigateFirewallSettings').adminPassword]",
-                    "customData": "[parameters('fortigateFirewallSettings').userData]"
+                    "customData": "[base64(parameters('fortigateFirewallSettings').userData)]"
                 },
                 "storageProfile": {
                     "imageReference": {
