@@ -18,58 +18,104 @@
         },
         "fortigateVMSize": {
             "type": "string",
-            "defaultValue": "Standard_DS1_v2",
+            "defaultValue": "Standard_F1",
+            "allowedValues": [
+                "Standard_F1",
+                "Standard_F16s",
+                "Standard_F1s",
+                "Standard_F2",
+                "Standard_F2s",
+                "Standard_F4",
+                "Standard_F4s",
+                "Standard_F8",
+                "Standard_F8s"
+            ],
             "metadata": {
-                "description": "fortigate Virtual Machine size"
+                "description": "Fortigate Virtual Machine size(If you select any other size than the default one the cost will be more)"
             }
         },
         "tenantID":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"provide your tenanad id detailes"
+                "description":"Provide tenantID for the current subscription"
             }
         },
         "clientID":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"Provide application ID of the service Principle"
+                "description":"Provide application ID of the service principle which crated earlier"
             }
         },
         "ClientSecret":{
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
-                "description":"Provide Password of the service principle"
+                "description":"Provide password of the service principle"
             }
         },
         "subscriptionID":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"provide your subscription id"
+                "description":"Provide the current subscription ID"
             }
         },
         "fabricConnectorAddressName":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"provide the name of the fabricConnectorAddress"
+                "description":"Provide the name of the fabric connector address"
             }
         },
         "hubFotigateVNetCIDR":{
             "type": "string",
             "defaultValue": "10.0.0.0/16",
             "metadata": {
-                "description":"provide the CIDR address for hub frotigate Vnet"
+                "description":"Provide the CIDR address for FortiGate vnet(Hub vnet)"
+            }
+        },
+        "FGPublicFacingSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description":"Provide the CIDR address for FortiGate public facing subnet"
+            }
+        },
+        "FGInsideSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description":"Provide the CIDR address for FortiGate internal(private facing) subnet"
+            }
+        },
+        "FGPublicFacingSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.0.4",
+            "metadata": {
+                "description":"Provide the static address of public facing subnet"
+            }
+        },
+        "FGInsideSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.1.4",
+            "metadata": {
+                "description":"Provide the statis address of internal(private facing) subnet"
             }
         },
         "spokeDemoVnetCIDR":{
             "type": "string",
             "defaultValue": "172.1.0.0/16",
             "metadata": {
-                "description":"provide the CIDR address for spokeDemo vnet"
+                "description":"Provide the CIDR address for Demo vnet(spoke)"
+            }
+        },
+        "spokeDemoSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "172.1.0.0/24",
+            "metadata": {
+                "description":"provide the CIDR address for Demo subnet(spoke)"
             }
         }
     },
@@ -86,9 +132,9 @@
             "virtualNetworkName": "[concat('ForiGateVNET',variables('suffix'))]",
             "addressPrefix": "[parameters('hubFotigateVNetCIDR')]",
             "subnet1Name": "[concat('PublicFacingSubnet',variables('suffix'))]",
-            "subnet1Prefix": "10.0.0.0/24",
+            "subnet1Prefix": "[parameters('FGPublicFacingSubnetCIDR')]",
             "subnet2Name": "[concat('InternalSubnet',variables('suffix'))]",
-            "subnet2Prefix": "10.0.1.0/24"
+            "subnet2Prefix": "[parameters('FGInsideSubnetCIDR')]"
         },
         "wlNetworkSettings": {
             "location": "[variables('location')]",
@@ -96,13 +142,13 @@
             "virtualNetworkName": "[concat('workLoadsVNET',variables('suffix'))]",
             "addressPrefix": "[parameters('spokeDemoVnetCIDR')]",
             "subnetName": "[concat('wlSubnet',variables('suffix'))]",
-            "subnetPrefix": "172.1.0.0/24"
+            "subnetPrefix": "[parameters('spokeDemoSubnetCIDR')]"
         },
         "fortigateFirewallSettings": {
             "location": "[variables('location')]",
             "fortiAvailName": "[concat('forti-avset',variables('suffix'))]",
-            "FGPubFacingAddress": "10.0.0.4",
-            "FGDMZAddress": "10.0.1.4",
+            "FGPubFacingAddress": "[parameters('FGPublicFacingSubnetAddress')]",
+            "FGDMZAddress": "[parameters('FGInsideSubnetAddress')]",
             "fortiPublicIPAddressName": "[concat('forti-pip',variables('suffix'))]",
             "publicIPAddressType": "Dynamic",
             "FortiGateName": "[concat('fortigate',variables('suffix'))]",
@@ -230,7 +276,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AT2LgNW8biSufl4BYqQUNWH_7HV7DGHBks5cvWUfwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVLGQT7C25CC4H4JLJS4YQFN6')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -279,7 +325,7 @@
         },
         "workload_URL": {
             "type": "string",
-            "value": "[concat('http://',reference('workloadserver').outputs.workloadFQDN.value)]"
+            "value": "[reference('workloadserver').outputs.workloadFQDN.value]"
         },
         "VM'sUserName":{
             "type": "string",
@@ -291,7 +337,7 @@
         },
         "EndUserVMPublicDNS":{
             "type": "string",
-            "value": "[concat('http://',reference('EndUserVM').outputs.enduserFQDN.value)]"
+            "value": "[reference('EndUserVM').outputs.enduserFQDN.value]"
         },
         "resourceGroupName":{
             "type": "string",
@@ -300,6 +346,10 @@
         "FortigateNic-1-IPAddress":{
             "type": "string",
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
-        }
+        },
+        "WorkloadVMPrivateIPAddress":{
+            "type": "string",
+            "value": "[reference('workloadserver').outputs.WorkloadVMPrivateIPAddress.value]"
+        }       
     }
 }
