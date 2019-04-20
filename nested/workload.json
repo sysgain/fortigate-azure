@@ -109,7 +109,7 @@
                         }
                     },
                     {
-                        "name": "Port_8888",
+                        "name": "Port_8888_outbound",
                         "properties": {
                             "protocol": "*",
                             "sourcePortRange": "*",
