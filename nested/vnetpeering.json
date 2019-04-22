@@ -146,7 +146,7 @@
             ]
         },
         {
-            "name": "[ parameters('wlNetworkSettings').virtualNetworkName]",
+            "name": "[parameters('wlNetworkSettings').virtualNetworkName]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "[parameters('apiVersions').networkApiVersion]",
             "location": "[resourceGroup().location]",
@@ -161,12 +161,10 @@
                 },
                 "subnets": [
                     {
-                        "name": "[ parameters('wlNetworkSettings').subnetName]",
+                        "name": "[parameters('wlNetworkSettings').subnetName]",
                         "properties": {
-                            "addressPrefix": "[ parameters('wlNetworkSettings').subnetPrefix]",
-                            "routeTable": {
-                                "id": "[variables('routeTableWLID')]"
-                            }
+                            "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix]"
+                            
                         }
                     }
                 ]
