@@ -34,6 +34,20 @@
                 "description": "Fortigate Virtual Machine size(If you select any other size than the default one the cost will be more)"
             }
         },
+        "azureLogin":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"Provide the Azure portal login id"
+            }
+        },
+        "azurePassword":{
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description":"Provide the Azure portal login password"
+            }
+        },
         "tenantID":{
             "type": "string",
             "defaultValue": "",
@@ -67,6 +81,13 @@
             "defaultValue": "",
             "metadata": {
                 "description":"Provide the name of the fabric connector address"
+            }
+        },
+        "fabricConnectorFirewallAddressName":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"Provide the name of teh FortiGate firewall address name"
             }
         },
         "hubFotigateVNetCIDR":{
@@ -166,7 +187,7 @@
             "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
             "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
             "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]",
-            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end')]"
+            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end')]"
         },
         "workloadsSettings": {
             "location": "[variables('location')]",
@@ -183,7 +204,13 @@
             "osOffer": "UbuntuServer",
             "osSku": "16.04-LTS",
             "storageAccountType": "Standard_LRS",
-            "routeTableName":"[concat('WorkloadRoute',variables('suffix'))]"
+            "routeTableName":"[concat('WorkloadRoute',variables('suffix'))]",
+            "tenantID":"[parameters('tenantID')]",
+            "clientID":"[parameters('clientID')]",
+            "ClientSecret":"[parameters('ClientSecret')]",
+            "subscriptionID":"[parameters('subscriptionID')]",
+            "rgName":"[variables('rgName')]",
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVO5P72YSP5SB6Y6Y5S4Y3W5Q')]"
         },
         "EndUserVMSettings": {
             "vnetName": "[concat('enduservnet',variables('suffix'))]",
@@ -202,7 +229,7 @@
             "Password": "[parameters('adminPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
-            "ubuntuOSVersion": "18.04-LTS"
+            "ubuntuOSVersion": "16.04-LTS"
         },
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
@@ -218,7 +245,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AT2LgJILSCVSNVHhrvUACMhkl07Pq-Fcks5cvWUewA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVLTKYFEILZJ3G4RAKS4Y3WZW')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -250,7 +277,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AT2LgPUkXfYkIg78BPUyZfnh6Q3bAIGZks5cvWUcwA%3D%3D')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVP4BNYHUWVERFKQTFS4Y3WZ2')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -276,7 +303,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVLGQT7C25CC4H4JLJS4YQFN6')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVMGNLFC57AMP6ZUSBK4Y3WZO')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -288,6 +315,12 @@
                     },
                     "apiVersions": {
                         "value": "[variables('apiVersions')]"
+                    },
+                    "azureLogin":{
+                        "value": "[parameters('azureLogin')]"
+                    },
+                    "azurePassword":{
+                        "value": "[parameters('azurePassword')]"
                     }
                 }
             }
@@ -299,7 +332,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE7OLVL7VCMRUILWEQI4HSC4YMA4I')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE7OLVNSQK27VUXZSVFMNUS4Y3WZ6')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -322,10 +355,6 @@
         "webUIAdminPassword": {
             "type": "string",
             "value": "[parameters('adminPassword')]"
-        },
-        "workload_URL": {
-            "type": "string",
-            "value": "[reference('workloadserver').outputs.workloadFQDN.value]"
         },
         "VM'sUserName":{
             "type": "string",
