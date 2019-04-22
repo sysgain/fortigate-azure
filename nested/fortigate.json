@@ -102,6 +102,9 @@
             "name": "[parameters('fortigateFirewallSettings').FortiGateName]",
             "apiVersion": "[parameters('apiVersions').computeApiVersion]",
             "location": "[parameters('fortigateFirewallSettings').location]",
+            "tags": {
+                "displayName": "firewall"
+            },
             "plan": {
                 "name": "[parameters('fortigateFirewallSettings').sku]",
                 "publisher": "[parameters('fortigateFirewallSettings').publisher]",
