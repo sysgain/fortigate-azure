@@ -205,7 +205,7 @@
                     "fileUris": [
                         "[parameters('workloadsSettings').fileUri]"
                     ],
-                    "commandToExecute": "[concat('sh testwebsite.sh',' ',parameters('workloadsSettings').clientID,' ',parameters('workloadsSettings').ClientSecret,' ',parameters('workloadsSettings').tenantID,' ',parameters('workloadsSettings').subscriptionID,' ',parameters('workloadsSettings').rgName,' ',parameters('wlNetworkSettings').subnetName,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ',parameters('azureLogin'),' ',parameters('azurePassword'))]"
+                    "commandToExecute": "[concat('sh fg-automate.sh',' ',parameters('workloadsSettings').clientID,' ',parameters('workloadsSettings').ClientSecret,' ',parameters('workloadsSettings').tenantID,' ',parameters('workloadsSettings').subscriptionID,' ',parameters('workloadsSettings').rgName,' ',parameters('wlNetworkSettings').subnetName,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ',parameters('azureLogin'),' ',parameters('azurePassword'))]"
                 }
             }
         }     
