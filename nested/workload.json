@@ -10,6 +10,12 @@
         },
         "workloadsSettings": {
             "type": "object"
+        },
+        "azureLogin":{
+            "type": "string"
+        },
+        "azurePassword":{
+            "type": "string"
         }
     },
     "variables": {
@@ -18,18 +24,6 @@
         "subnetid": "[concat(variables('vnetRef'),'/subnets/',parameters('wlNetworkSettings').subnetName)]"
     },
     "resources": [
-        {
-            "apiVersion": "[parameters('apiVersions').networkApiVersion]",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat(parameters('workloadsSettings').publicIpAddressName)]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "[parameters('workloadsSettings').publicIpAddressType]",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('workloadsSettings').publicIPdnsPrefix)]"
-                }
-            }
-        },
         {
             "name": "[parameters('workloadsSettings').networkSecurityGroupName]",
             "type": "Microsoft.Network/networkSecurityGroups",
@@ -132,20 +126,16 @@
             "apiVersion": "[parameters('apiVersions').networkApiVersion]",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(parameters('workloadsSettings').nicName)]",
-            "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]",  
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('workloadsSettings').publicIpAddressName))]"
-            ],  
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ifconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
-                            
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('workloadsSettings').publicIpAddressName))]"
-                            },
                             "subnet": {
                                 "id": "[variables('subnetId')]"
                             }
@@ -185,10 +175,7 @@
                         "version": "latest"
                     },
                     "osDisk": {
-                        "createOption": "FromImage",
-                        "managedDisk": {
-                            "storageAccountType": "[parameters('workloadsSettings').storageAccountType]"
-                        }
+                        "createOption": "FromImage"
                     },
                     "dataDisks": []
                 },
@@ -200,13 +187,30 @@
                     ]
                 }
             }
-        }       
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('workloadsSettings').virtualMachineName,'/Extensions')]",
+            "location": "[parameters('workloadsSettings').location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',parameters('workloadsSettings').virtualMachineName)]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[parameters('workloadsSettings').fileUri]"
+                    ],
+                    "commandToExecute": "[concat('sh testwebsite.sh',' ',parameters('workloadsSettings').clientID,' ',parameters('workloadsSettings').ClientSecret,' ',parameters('workloadsSettings').tenantID,' ',parameters('workloadsSettings').subscriptionID,' ',parameters('workloadsSettings').rgName,' ',parameters('wlNetworkSettings').subnetName,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ',parameters('azureLogin'),' ',parameters('azurePassword'))]"
+                }
+            }
+        }     
     ],
     "outputs": {
-        "workloadFQDN": {
-            "type": "string",
-            "value": "[reference(concat(parameters('workloadsSettings').publicIpAddressName)).dnsSettings.fqdn]"
-        },
         "WorkloadVMPrivateIPAddress":{
             "type": "string",
             "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', parameters('workloadsSettings').nicName)).ipConfigurations[0].properties.privateIPAddress]"
