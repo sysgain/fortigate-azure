@@ -136,14 +136,14 @@
             "type": "string",
             "defaultValue": "172.1.0.0/24",
             "metadata": {
-                "description":"provide the CIDR address for Demo subnet1(spoke1)"
+                "description":"provide the CIDR address for Demo subnet1(spoke)"
             }
         },
         "spokeDemoSubnetCIDR2":{
             "type": "string",
             "defaultValue": "172.1.1.0/24",
             "metadata": {
-                "description":"Provide the CIDR address for Demo subnet2(spoke2)"
+                "description":"Provide the CIDR address for Demo subnet2(spoke)"
             }
         }
     },
@@ -202,7 +202,7 @@
             "location": "[variables('location')]",
             "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
             "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
-            "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
+            "publicIPdnsPrefix": "[concat('workload-dns',variables('suffix'))]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
