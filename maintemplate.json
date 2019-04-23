@@ -76,7 +76,7 @@
                 "description":"Provide the current subscription ID"
             }
         },
-        "fabricConnectorAddressName":{
+        "fabricConnectorWorkloadAddressName":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
@@ -97,28 +97,28 @@
                 "description":"Provide the CIDR address for FortiGate vnet(Hub vnet)"
             }
         },
-        "FGPublicFacingSubnetCIDR":{
+        "FortiGatePublicFacingSubnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.0.0/24",
             "metadata": {
                 "description":"Provide the CIDR address for FortiGate public facing subnet"
             }
         },
-        "FGInsideSubnetCIDR":{
+        "FortiGateInsideSubnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.1.0/24",
             "metadata": {
                 "description":"Provide the CIDR address for FortiGate internal(private facing) subnet"
             }
         },
-        "FGPublicFacingSubnetAddress":{
+        "FortiGatePublicFacingSubnetAddress":{
             "type": "string",
             "defaultValue": "10.0.0.4",
             "metadata": {
                 "description":"Provide the static address of public facing subnet"
             }
         },
-        "FGInsideSubnetAddress":{
+        "FortiGateInsideSubnetAddress":{
             "type": "string",
             "defaultValue": "10.0.1.4",
             "metadata": {
@@ -132,11 +132,18 @@
                 "description":"Provide the CIDR address for Demo vnet(spoke)"
             }
         },
-        "spokeDemoSubnetCIDR":{
+        "spokeDemoSubnetCIDR1":{
             "type": "string",
             "defaultValue": "172.1.0.0/24",
             "metadata": {
-                "description":"provide the CIDR address for Demo subnet(spoke)"
+                "description":"provide the CIDR address for Demo subnet1(spoke1)"
+            }
+        },
+        "spokeDemoSubnetCIDR2":{
+            "type": "string",
+            "defaultValue": "172.1.1.0/24",
+            "metadata": {
+                "description":"Provide the CIDR address for Demo subnet2(spoke2)"
             }
         }
     },
@@ -153,28 +160,30 @@
             "virtualNetworkName": "[concat('ForiGateVNET',variables('suffix'))]",
             "addressPrefix": "[parameters('hubFotigateVNetCIDR')]",
             "subnet1Name": "[concat('PublicFacingSubnet',variables('suffix'))]",
-            "subnet1Prefix": "[parameters('FGPublicFacingSubnetCIDR')]",
+            "subnet1Prefix": "[parameters('FortiGatePublicFacingSubnetCIDR')]",
             "subnet2Name": "[concat('InternalSubnet',variables('suffix'))]",
-            "subnet2Prefix": "[parameters('FGInsideSubnetCIDR')]"
+            "subnet2Prefix": "[parameters('FortiGateInsideSubnetCIDR')]"
         },
         "wlNetworkSettings": {
             "location": "[variables('location')]",
             "networkApiVersion": "2016-03-30",
             "virtualNetworkName": "[concat('workLoadsVNET',variables('suffix'))]",
             "addressPrefix": "[parameters('spokeDemoVnetCIDR')]",
-            "subnetName": "[concat('wlSubnet',variables('suffix'))]",
-            "subnetPrefix": "[parameters('spokeDemoSubnetCIDR')]"
+            "subnetName1": "[concat('wlSubnet1',variables('suffix'))]",
+            "subnetName2": "[concat('wlSubnet2',variables('suffix'))]",
+            "subnetPrefix1": "[parameters('spokeDemoSubnetCIDR1')]",
+            "subnetPrefix2": "[parameters('spokeDemoSubnetCIDR2')]"
         },
         "fortigateFirewallSettings": {
             "location": "[variables('location')]",
             "fortiAvailName": "[concat('forti-avset',variables('suffix'))]",
-            "FGPubFacingAddress": "[parameters('FGPublicFacingSubnetAddress')]",
-            "FGDMZAddress": "[parameters('FGInsideSubnetAddress')]",
+            "FGPubFacingAddress": "[parameters('FortiGatePublicFacingSubnetAddress')]",
+            "FGDMZAddress": "[parameters('FortiGateInsideSubnetAddress')]",
             "fortiPublicIPAddressName": "[concat('forti-pip',variables('suffix'))]",
             "publicIPAddressType": "Dynamic",
-            "FortiGateName": "[concat('fortigate',variables('suffix'))]",
-            "fortiNicName1": "[concat('forti-nic1',variables('suffix'))]",
-            "fortiNicName2": "[concat('forti-nic2',variables('suffix'))]",
+            "FortiGateName": "[concat('fortigateVM',variables('suffix'))]",
+            "fortiNicName1": "[concat('forti-nic-1',variables('suffix'))]",
+            "fortiNicName2": "[concat('forti-nic-2',variables('suffix'))]",
             "sku": "fortinet_fg-vm_payg",
             "version": "6.0.4",
             "product": "fortinet_fortigate-vm_v5",
@@ -187,15 +196,17 @@
             "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
             "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
             "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]",
-            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end')]"
+            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorWorkloadAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end')]"
         },
         "workloadsSettings": {
             "location": "[variables('location')]",
-            "virtualMachineName": "[concat('workloadVM',variables('suffix'))]",
+            "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
+            "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
             "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
-            "nicName": "[concat('wl-vnic',variables('suffix'))]",
+            "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
+            "nicName2": "[concat('wl-nic-2',variables('suffix'))]",
             "networkSecurityGroupName": "[concat('workload-nsg',variables('suffix'))]",
             "publicIpAddressName": "[concat('workload-pip',variables('suffix'))]",
             "publicIpAddressType": "Static",
@@ -210,10 +221,10 @@
             "ClientSecret":"[parameters('ClientSecret')]",
             "subscriptionID":"[parameters('subscriptionID')]",
             "rgName":"[variables('rgName')]",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVO5P72YSP5SB6Y6Y5S4Y3W5Q')]"
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVJVBIOFS4ONPXOHBOK4Y7UP6')]"
         },
         "EndUserVMSettings": {
-            "vnetName": "[concat('enduservnet',variables('suffix'))]",
+            "vnetName": "[concat('enduserVNET',variables('suffix'))]",
             "subnetName": "[concat('endusersubnet',variables('suffix'))]",
             "addressPrefix": "10.5.0.0/16",
             "subnetPrefix": "10.5.1.0/24",
@@ -223,7 +234,7 @@
             "dnsLabelPrefix": "[concat('enduserdns',variables('suffix'))]",
             "location": "[variables('location')]",
             "nicName": "[concat('enduser-nic',variables('suffix'))]",
-            "VmName": "[concat('ENDUSERVM',variables('suffix'))]",
+            "VmName": "[concat('enduserVM',variables('suffix'))]",
             "vmSize": "Standard_DS1_v2",
             "Username": "[parameters('adminUsername')]",
             "Password": "[parameters('adminPassword')]",
@@ -245,7 +256,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVLTKYFEILZJ3G4RAKS4Y3WZW')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVOKN3Q5PY3RMEXAV4S4Y7UHC')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -269,7 +280,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "fortigateServer",
+            "name": "fortigateVM",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "dependsOn": [
                 "vnetpeering"
@@ -295,7 +306,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "workloadserver",
+            "name": "workloadVMs",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "dependsOn": [
                 "vnetpeering"
@@ -303,7 +314,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVMGNLFC57AMP6ZUSBK4Y3WZO')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVNYWBV73333ESWR4L24Y7UV2')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -346,7 +357,7 @@
     "outputs": {
         "fortigateWebURL": {
             "type": "string",
-            "value": "[concat('https://',reference('fortigateServer').outputs.fortigateFQDN.value)]"
+            "value": "[concat('https://',reference('fortigateVM').outputs.fortigateFQDN.value)]"
         },
         "webUIAdminUsername": {
             "type": "string",
@@ -376,9 +387,13 @@
             "type": "string",
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
         },
-        "WorkloadVMPrivateIPAddress":{
+        "WorkloadVMPrivateIPAddress1":{
             "type": "string",
-            "value": "[reference('workloadserver').outputs.WorkloadVMPrivateIPAddress.value]"
-        }       
+            "value": "[reference('workloadVMs').outputs.WorkloadVMPrivateIPAddress1.value]"
+        },
+        "WorkloadVMPrivateIPAddress2":{
+            "type": "string",
+            "value": "[reference('workloadVMs').outputs.WorkloadVMPrivateIPAddress2.value]"
+        }   
     }
 }
