@@ -21,7 +21,8 @@
     "variables": {
         "rgName": "[resourceGroup().name]",
         "vnetRef": "[resourceId(variables('rgName'), 'Microsoft.Network/virtualNetworks', parameters('wlNetworkSettings').virtualNetworkName)]",
-        "subnetid": "[concat(variables('vnetRef'),'/subnets/',parameters('wlNetworkSettings').subnetName)]"
+        "subnetid1": "[concat(variables('vnetRef'),'/subnets/',parameters('wlNetworkSettings').subnetName1)]",
+        "subnetid2":"[concat(variables('vnetRef'),'/subnets/',parameters('wlNetworkSettings').subnetName2)]"
     },
     "resources": [
         {
@@ -125,7 +126,7 @@
         {
             "apiVersion": "[parameters('apiVersions').networkApiVersion]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(parameters('workloadsSettings').nicName)]",
+            "name": "[concat(parameters('workloadsSettings').nicName1)]",
             "location": "[resourceGroup().location]",  
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
@@ -137,7 +138,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[variables('subnetId')]"
+                                "id": "[variables('subnetId1')]"
                             }
                         }
                     }
@@ -146,24 +147,49 @@
                     "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
                 }
             }
-        },   
+        }, 
+        {
+            "apiVersion": "[parameters('apiVersions').networkApiVersion]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(parameters('workloadsSettings').nicName2)]",
+            "location": "[resourceGroup().location]",  
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ifconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetId2')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('workloadsSettings').networkSecurityGroupName)]"
+                }
+            }
+        },
         {
             "apiVersion": "[parameters('apiVersions').computeApiVersion]",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(parameters('workloadsSettings').virtualMachineName)]",
+            "name": "[concat(parameters('workloadsSettings').virtualMachineName1)]",
             "location": "[resourceGroup().location]",
             "tags": {
                 "displayName": "web"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName))]"
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName1))]"
             ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('workloadsSettings').vmSize]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(parameters('workloadsSettings').virtualMachineName)]",
+                    "computerName": "[concat(parameters('workloadsSettings').virtualMachineName1)]",
                     "adminUsername": "[parameters('workloadsSettings').adminUsername]",
                     "adminPassword": "[parameters('workloadsSettings').adminPassword]"
                 },
@@ -182,7 +208,48 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName1))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "[parameters('apiVersions').computeApiVersion]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(parameters('workloadsSettings').virtualMachineName2)]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "displayName": "app"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName2))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('workloadsSettings').vmSize]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('workloadsSettings').virtualMachineName2)]",
+                    "adminUsername": "[parameters('workloadsSettings').adminUsername]",
+                    "adminPassword": "[parameters('workloadsSettings').adminPassword]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('workloadsSettings').osPublisher]",
+                        "offer": "[parameters('workloadsSettings').osOffer]",
+                        "sku": "[parameters('workloadsSettings').osSku]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('workloadsSettings').nicName2))]"
                         }
                     ]
                 }
@@ -190,11 +257,11 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('workloadsSettings').virtualMachineName,'/Extensions')]",
+            "name": "[concat(parameters('workloadsSettings').virtualMachineName1,'/Extensions')]",
             "location": "[parameters('workloadsSettings').location]",
             "apiVersion": "2017-03-30",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/',parameters('workloadsSettings').virtualMachineName)]"
+                "[concat('Microsoft.Compute/virtualMachines/',parameters('workloadsSettings').virtualMachineName1)]"
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
@@ -205,15 +272,19 @@
                     "fileUris": [
                         "[parameters('workloadsSettings').fileUri]"
                     ],
-                    "commandToExecute": "[concat('sh fg-automate.sh',' ',parameters('workloadsSettings').clientID,' ',parameters('workloadsSettings').ClientSecret,' ',parameters('workloadsSettings').tenantID,' ',parameters('workloadsSettings').subscriptionID,' ',parameters('workloadsSettings').rgName,' ',parameters('wlNetworkSettings').subnetName,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ',parameters('azureLogin'),' ',parameters('azurePassword'))]"
+                    "commandToExecute": "[concat('sh fg-automate.sh',' ',parameters('workloadsSettings').clientID,' ',parameters('workloadsSettings').ClientSecret,' ',parameters('workloadsSettings').tenantID,' ',parameters('workloadsSettings').subscriptionID,' ',parameters('workloadsSettings').rgName,' ',parameters('wlNetworkSettings').subnetName1,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ',parameters('azureLogin'),' ',parameters('azurePassword'))]"
                 }
             }
         }     
     ],
     "outputs": {
-        "WorkloadVMPrivateIPAddress":{
+        "WorkloadVMPrivateIPAddress1":{
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', parameters('workloadsSettings').nicName)).ipConfigurations[0].properties.privateIPAddress]"
+            "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', parameters('workloadsSettings').nicName1)).ipConfigurations[0].properties.privateIPAddress]"
+        },
+        "WorkloadVMPrivateIPAddress2":{
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', parameters('workloadsSettings').nicName2)).ipConfigurations[0].properties.privateIPAddress]"
         }
     }
 }
