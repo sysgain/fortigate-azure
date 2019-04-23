@@ -4,11 +4,12 @@ secretkey=$2
 tenatid=$3
 subscriptionid=$4
 rgName=$5
-wlsubnet=$6
-wlvnet=$7
-wlroutetableName=$8
-azurelogin=$9
-azurepassword=${10}
+wlsubnet1=$6
+wlsubnet2=$7
+wlvnet=$8
+wlroutetableName=$9
+azurelogin=${10}
+azurepassword=${11}
 
 echo "=====================================installing the test website in workload VM========================================"
 
@@ -33,7 +34,7 @@ sleep 1m
 
 cd /home/$USER
 
-sudo az login -u "$azurelogin" -p "${azurepassword}" --tenant "$tenatid"
+sudo az login -u "${azurelogin}" -p "${azurepassword}" --tenant "$tenatid"
 
 sudo az account set -s "$subscriptionid" 
 
@@ -45,4 +46,6 @@ az role assignment create --role "Virtual Machine Contributor" --assignee "$serv
 
 echo "===============================associating the workload subnet to the workload route table================================"
 
-az network vnet subnet update -g "$rgName" -n "$wlsubnet" --vnet-name "$wlvnet" --route-table "$wlroutetableName"
+az network vnet subnet update -g "$rgName" -n "$wlsubnet1" --vnet-name "$wlvnet" --route-table "$wlroutetableName"
+
+az network vnet subnet update -g "$rgName" -n "$wlsubnet2" --vnet-name "$wlvnet" --route-table "$wlroutetableName"
