@@ -166,7 +166,15 @@
                             "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix1]"
                             
                         }
+                    },
+                    {
+                        "name": "[parameters('wlNetworkSettings').subnetName2]",
+                        "properties": {
+                            "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix2]"
+                            
+                        }
                     }
+
                 ]
             },
             "resources": [
