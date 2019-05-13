@@ -161,7 +161,7 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('wlNetworkSettings').subnetName]",
+                        "name": "[parameters('wlNetworkSettings').subnetName1]",
                         "properties": {
                             "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix]"
                             
