@@ -216,7 +216,7 @@
                     "fileUris": [
                         "[parameters('EndUserVMSettings').fileUri]"
                     ],
-                    "commandToExecute": "[concat('sh fg-script.sh',' ',parameters('adminUsername'),' ',parameters('workloadsSettings').virtualMachineName1,' ',parameters('workloadsSettings').virtualMachineName2,' ',parameters('workloadsSettings').nicName1,' ',parameters('workloadsSettings').nicName2,' ',parameters('workloadsSettings').networkSecurityGroupName,' ',parameters('workloadsSettings').osDiskName1,' ',parameters('workloadsSettings').osDiskName2,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ','to-InternetDefaultRoute',' ',resourceGroup().name)]"
+                    "commandToExecute": "[concat('sh fg-python-script.sh',' ',parameters('adminUsername'),' ',parameters('workloadsSettings').virtualMachineName1,' ',parameters('workloadsSettings').virtualMachineName2,' ',parameters('workloadsSettings').nicName1,' ',parameters('workloadsSettings').nicName2,' ',parameters('workloadsSettings').networkSecurityGroupName,' ',parameters('workloadsSettings').osDiskName1,' ',parameters('workloadsSettings').osDiskName2,' ',parameters('wlNetworkSettings').virtualNetworkName,' ',parameters('workloadsSettings').routeTableName,' ','to-InternetDefaultRoute',' ',resourceGroup().name)]"
                 }
             }
         }    
