@@ -3,17 +3,22 @@ azureuser=$1
 
 cd /home/$azureuser
 
-echo "vmname1=$2" >>outparams.txt
-echo "vmname2=$3" >>outparams.txt
-echo "nicname1=$4" >>outparams.txt
-echo "nicname2=$5" >>outparams.txt
-echo "nsgname=$6" >>outparams.txt
-echo "diskname1=$7" >>outparams.txt
-echo "diskname2=$8" >>outparams.txt
-echo "vnetname=$9" >>outparams.txt
-echo "routename=${10}" >>outparams.txt
-echo "routetablename=${11}" >>outparams.txt
-echo "rgname=${12}" >>outparams.txt
+echo "AppID=$2" >>outparams.txt
+echo "AppPassword=$3" >>outparams.txt
+echo "TenantID=$4" >>outparams.txt
+echo "SubscriptionID=$5" >>outparams.txt
+echo "RGName=$6" >>outparams.txt
+echo "VmName1=$7" >>outparams.txt
+echo "VmName2=$8" >>outparams.txt
+echo "Nic1=$9" >>outparams.txt
+echo "Nic2=${10}" >>outparams.txt
+echo "Disk1=${11}" >>outparams.txt
+echo "Disk2=${12}" >>outparams.txt
+echo "NSG=${13}" >>outparams.txt
+echo "RouteTable=${14}" >>outparams.txt
+echo "Route=${15}" >>outparams.txt
+echo "VNet=${16}" >>outparams.txt
+
 
 #download the python files to the home dir
 
