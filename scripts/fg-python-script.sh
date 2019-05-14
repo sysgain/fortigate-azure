@@ -1,8 +1,6 @@
 #! /bin/bash
 azureuser=$1
-
 cd /home/$azureuser
-
 echo "AppID=$2" >>outparams.txt
 echo "AppPassword=$3" >>outparams.txt
 echo "TenantID=$4" >>outparams.txt
@@ -23,7 +21,7 @@ subnetname2=${18}
 subnetaddprefix1=${19}
 subnetaddprefix2=${20}
 
-#download all the pre-requsites to install python3 and all the python files to the home dir
+#download all the pr-requsites to install python packages and all the python files to the home dir
 
 sudo apt-get -y update
 sudo apt-get -y upgrade
@@ -39,8 +37,8 @@ source my_env/bin/activate
 
 cd /home/$azureuser
 
-wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/fortigate-azure/scripts/cleanup.sh"
-wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/fortigate-azure/scripts/cleanupSpokeVnet.py"
-wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/fortigate-azure/scripts/enableRoute.py"
+wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/cleanup.sh"
+wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/cleanupSpokeVnet.py"
+wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/enableRoute.py"
 
 python3 enableRoute.py $AppID $AppPassword $TenantID $SubscriptionID $RGName ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${Route}
