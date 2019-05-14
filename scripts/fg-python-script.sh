@@ -16,6 +16,13 @@ echo "NSG=${13}" >>outparams.txt
 echo "RouteTable=${14}" >>outparams.txt
 echo "Route=${15}" >>outparams.txt
 echo "VNet=${16}" >>outparams.txt
+AppID=$2
+AppPassword=$3
+TenantID=$4
+SubscriptionID=$5
+RGName=$6
+Route=${15}
+VNet=${16}
 subnetname1=${17}
 subnetname2=${18}
 subnetaddprefix1=${19}
@@ -44,4 +51,4 @@ wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Late
 wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/cleanupSpokeVnet.py"
 wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/enableRoute.py"
 
-python3 enableRoute.py $AppID $AppPassword $TenantID $SubscriptionID $RGName ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${Route}
+python3 enableRoute.py ${AppID} ${AppPassword} ${TenantID} ${SubscriptionID} ${RGName} ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${Route}
