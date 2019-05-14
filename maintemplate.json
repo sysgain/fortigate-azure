@@ -34,27 +34,6 @@
                 "description": "Fortigate Virtual Machine size(If you select any other size than the default one the cost will be more)"
             }
         },
-        "azureLogin":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description":"Provide the Azure portal login id"
-            }
-        },
-        "azurePassword":{
-            "type": "securestring",
-            "defaultValue": "",
-            "metadata": {
-                "description":"Provide the Azure portal login password"
-            }
-        },
-        "tenantID":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description":"Provide tenantID for the current subscription"
-            }
-        },
         "clientID":{
             "type": "string",
             "defaultValue": "",
@@ -69,25 +48,47 @@
                 "description":"Provide password of the service principle"
             }
         },
-        "subscriptionID":{
+        "ExistingspokeVNet":{
             "type": "string",
             "defaultValue": "",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
+        "existingVnetName":{
+            "type": "string",
+            "defaultValue": "NA",
             "metadata": {
-                "description":"Provide the current subscription ID"
+                "description":"If you choose ExistingspokeVNet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
+            }
+        },
+        "existingSubnetName":{
+            "type": "string",
+            "defaultValue": "NA",
+            "metadata": {
+                "description":"If you choose ExistingspokeVNet as YES, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
+            }
+        },
+        "existingSubnetPrefix":{
+            "type": "string",
+            "defaultValue": "NA",
+            "metadata": {
+                "description":"If you choose ExistingspokeVNet as YES, then provide the Address prefix of the existing subnet.Otherwise keep the default value as it is"
             }
         },
         "fabricConnectorWorkloadAddressName":{
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "testip",
             "metadata": {
                 "description":"Provide the name of the fabric connector address"
             }
         },
         "fabricConnectorFirewallAddressName":{
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "firewallip",
             "metadata": {
-                "description":"Provide the name of the FortiGate firewall address name"
+                "description":"Provide the name of teh FortiGate firewall address name"
             }
         },
         "hubFotigateVNetCIDR":{
@@ -122,7 +123,7 @@
             "type": "string",
             "defaultValue": "10.0.1.4",
             "metadata": {
-                "description":"Provide the static address of internal(private facing) subnet"
+                "description":"Provide the statis address of internal(private facing) subnet"
             }
         },
         "spokeDemoVnetCIDR":{
@@ -136,14 +137,14 @@
             "type": "string",
             "defaultValue": "172.1.0.0/24",
             "metadata": {
-                "description":"provide the CIDR address for Demo subnet1(spoke)"
+                "description":"provide the CIDR address for Demo subnet1(spoke1)"
             }
         },
         "spokeDemoSubnetCIDR2":{
             "type": "string",
             "defaultValue": "172.1.1.0/24",
             "metadata": {
-                "description":"Provide the CIDR address for Demo subnet2(spoke)"
+                "description":"Provide the CIDR address for Demo subnet2(spoke2)"
             }
         }
     },
@@ -196,13 +197,13 @@
             "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
             "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
             "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]",
-            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',parameters('tenantID'),'\" \n set subscription-id \"',parameters('subscriptionID'),'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorWorkloadAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end')]"
+            "userData": "[concat('config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',subscription().tenantId,'\" \n set subscription-id \"',subscription().subscriptionId,'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorWorkloadAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end')]"
         },
         "workloadsSettings": {
             "location": "[variables('location')]",
             "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
             "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
-            "publicIPdnsPrefix": "[concat('workload-dns',variables('suffix'))]",
+            "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
@@ -216,21 +217,23 @@
             "osSku": "16.04-LTS",
             "storageAccountType": "Standard_LRS",
             "routeTableName":"[concat('WorkloadRoute',variables('suffix'))]",
-            "tenantID":"[parameters('tenantID')]",
+            "tenantID":"[subscription().tenantId]",
             "clientID":"[parameters('clientID')]",
             "ClientSecret":"[parameters('ClientSecret')]",
-            "subscriptionID":"[parameters('subscriptionID')]",
+            "subscriptionID":"[subscription().subscriptionId]",
             "rgName":"[variables('rgName')]",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVJVBIOFS4ONPXOHBOK4Y7UP6')]"
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVPIAAF6H5TIY3ZHMLC44J42M')]",
+            "osDiskName1":"[concat('wlOsDisk-1',variables('suffix'))]",
+            "osDiskName2":"[concat('wlOsDisk-2',variables('suffix'))]"
         },
         "EndUserVMSettings": {
             "vnetName": "[concat('enduserVNET',variables('suffix'))]",
             "subnetName": "[concat('endusersubnet',variables('suffix'))]",
             "addressPrefix": "10.5.0.0/16",
             "subnetPrefix": "10.5.1.0/24",
-            "pipName": "[concat('enduser-pip',variables('suffix'))]",
+            "pipName": "[concat('enduserpip',variables('suffix'))]",
             "publicIPAddressType": "Dynamic",
-            "nsgName":"[concat('enduser-nsg',variables('suffix'))]",
+            "nsgName":"[concat('endusernsg',variables('suffix'))]",
             "dnsLabelPrefix": "[concat('enduserdns',variables('suffix'))]",
             "location": "[variables('location')]",
             "nicName": "[concat('enduser-nic',variables('suffix'))]",
@@ -240,8 +243,10 @@
             "Password": "[parameters('adminPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
-            "ubuntuOSVersion": "16.04-LTS"
-        },
+            "ubuntuOSVersion": "16.04-LTS",
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh?token=AE7OLVJVGC2RIRLWLFKBOMK44PA4M')]",
+            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh?token=AE7OLVMNBQECONM7PUUQJTK44PH36')]"
+        },        
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
@@ -251,12 +256,43 @@
     "resources": [
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "vnetPeering",
+            "name": "vnetPeeringExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVOKN3Q5PY3RMEXAV4S4Y7UHC')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering-existing.json?token=AE7OLVO3R5EWFMTJJNQDPA244J4RC')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },                 
+                    "fortigateFirewallSettings": {
+                        "value": "[variables('fortigateFirewallSettings')]"
+                    },
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    },
+                    "workloadsSettings":{
+                        "value":"[variables('workloadsSettings')]"
+                    },
+                    "existingVNetName":{
+                        "value":"[parameters('existingVNetName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "vnetPeeringNew",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVPVVV2CAUILMH56T4C44KAAO')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -282,13 +318,14 @@
             "type": "Microsoft.Resources/deployments",
             "name": "fortigateVM",
             "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
             "dependsOn": [
-                "vnetpeering"
+                "vnetpeeringExisting"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVP4BNYHUWVERFKQTFS4Y3WZ2')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVOFVSX6GM6YKDVR3BK44J4QQ')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -306,15 +343,76 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "workloadVMs",
+            "name": "fortigateVM1",
             "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
             "dependsOn": [
-                "vnetpeering"
+                "vnetpeeringNew"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVNYWBV73333ESWR4L24Y7UV2')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVOFVSX6GM6YKDVR3BK44J4QQ')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "fortigateFirewallSettings": {
+                        "value": "[variables('fortigateFirewallSettings')]"
+                    },                 
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },                 
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "workloadVMExisting",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "dependsOn": [
+                "vnetpeeringExisting"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json?token=AE7OLVNHV3PTEPOHRMNLGP244J4RK')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },   
+                    "apiVersions": {
+                        "value": "[variables('apiVersions')]"
+                    },
+                    "existingVNetName":{
+                        "value":"[parameters('existingVNetName')]"
+                    },
+                    "existingSubnetName":{
+                        "value":"[parameters('existingSubnetName')]"
+                    },
+                    "adminUsername":{
+                        "value": "[parameters('adminUsername')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "workloadVMNew",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "dependsOn": [
+                "vnetpeeringNew"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVLYMTI2TLPVIU7JOQK44J4RO')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -327,37 +425,101 @@
                     "apiVersions": {
                         "value": "[variables('apiVersions')]"
                     },
-                    "azureLogin":{
-                        "value": "[parameters('azureLogin')]"
-                    },
-                    "azurePassword":{
-                        "value": "[parameters('azurePassword')]"
+                    "adminUsername":{
+                        "value": "[parameters('adminUsername')]"
                     }
                 }
             }
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "EndUserVM",
+            "name": "EndUserVMExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "dependsOn": [
+                "workloadVMExisting"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE7OLVNSQK27VUXZSVFMNUS4Y3WZ6')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json?token=AE7OLVI765KV4KHT57DZKDC44PHYS')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "EndUserVMSettings":{
                         "value":"[variables('EndUserVMSettings')]"
-                    }
+                    },
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },   
+                    "existingVNetName":{
+                        "value":"[parameters('existingVNetName')]"
+                    },
+                    "existingSubnetName":{
+                        "value":"[parameters('existingSubnetName')]"
+                    },
+                    "existingSubnetPrefix":{
+                        "value":"[parameters('existingSubnetPrefix')]"
+                    },
+                    "adminUsername":{
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "clientID":{
+                        "value": "[parameters('clientID')]"
+                    },
+                    "ClientSecret":{
+                        "value": "[parameters('ClientSecret')]"
+                    }   
                 }
             }
-        }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "EndUserVMNew",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "dependsOn": [
+                "workloadVMNew"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE7OLVLSFTYEZDIDFBTR2SK44PHYW')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "EndUserVMSettings":{
+                        "value":"[variables('EndUserVMSettings')]"
+                    },
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },   
+                    "wlNetworkSettings": {
+                        "value": "[variables('wlNetworkSettings')]"
+                    },
+                    "adminUsername":{
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "clientID":{
+                        "value": "[parameters('clientID')]"
+                    },
+                    "ClientSecret":{
+                        "value": "[parameters('ClientSecret')]"
+                    }   
+                }
+            }
+        }      
     ],
     "outputs": {
-        "fortigateWebURL": {
+        "fortigateWebURL": { 
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
             "type": "string",
             "value": "[concat('https://',reference('fortigateVM').outputs.fortigateFQDN.value)]"
+        },
+        "fortigateWebURL1": {
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "type": "string",
+            "value": "[concat('https://',reference('fortigateVM1').outputs.fortigateFQDN.value)]"
         },
         "webUIAdminUsername": {
             "type": "string",
@@ -376,8 +538,14 @@
             "value": "[parameters('adminPassword')]"
         },
         "EndUserVMPublicDNS":{
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
             "type": "string",
-            "value": "[reference('EndUserVM').outputs.enduserFQDN.value]"
+            "value": "[reference('EndUserVMExisting').outputs.enduserFQDN.value]"
+        },
+        "EndUserVMPublicDNS1":{
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "type": "string",
+            "value": "[reference('EndUserVMNew').outputs.enduserFQDN.value]"
         },
         "resourceGroupName":{
             "type": "string",
@@ -387,13 +555,20 @@
             "type": "string",
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
         },
-        "WorkloadVMPrivateIPAddress1":{
+        "WorkloadVMPrivateIPAddress":{
+            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
             "type": "string",
-            "value": "[reference('workloadVMs').outputs.WorkloadVMPrivateIPAddress1.value]"
+            "value": "[reference('workloadVMExisting').outputs.WorkloadVMPrivateIPAddress1.value]"
+        },
+        "WorkloadVMPrivateIPAddress1":{
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "type": "string",
+            "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress1.value]"
         },
         "WorkloadVMPrivateIPAddress2":{
+            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
             "type": "string",
-            "value": "[reference('workloadVMs').outputs.WorkloadVMPrivateIPAddress2.value]"
+            "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress2.value]"
         }   
     }
 }
