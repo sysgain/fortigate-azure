@@ -51,4 +51,6 @@ wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Late
 wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/cleanupSpokeVnet.py"
 wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Latest/scripts/enableRoute.py"
 
-python3 enableRoute.py ${AppID} ${AppPassword} ${TenantID} ${SubscriptionID} ${RGName} ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${Route}
+touch cleanup1.log
+
+python3 enableRoute.py ${AppID} ${AppPassword} ${TenantID} ${SubscriptionID} ${RGName} ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${Route} >> cleanup.log1 2>&1
