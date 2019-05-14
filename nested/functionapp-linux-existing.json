@@ -78,7 +78,7 @@
                             "value": "[parameters('existingSubnetName')]"
                         },
                         {
-                            "name":"to-InternetDefaultRoute",
+                            "name":"InternetDefaultRoute",
                             "value": "to-InternetDefaultRoute"
                         },
                         {
