@@ -222,7 +222,7 @@
             "ClientSecret":"[parameters('ClientSecret')]",
             "subscriptionID":"[subscription().subscriptionId]",
             "rgName":"[variables('rgName')]",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE7OLVPIAAF6H5TIY3ZHMLC44J42M')]",
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE6YXAEOTUQ4RTICNJV2ROK45ULWG')]",
             "osDiskName1":"[concat('wlOsDisk-1',variables('suffix'))]",
             "osDiskName2":"[concat('wlOsDisk-2',variables('suffix'))]"
         },
@@ -244,8 +244,8 @@
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
             "ubuntuOSVersion": "16.04-LTS",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh?token=AE7OLVJVGC2RIRLWLFKBOMK44PA4M')]",
-            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh?token=AE7OLVMNBQECONM7PUUQJTK44PH36')]"
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh?token=AE6YXAG2CKJA3DCGNMOHACK45UL2M')]",
+            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh?token=AE6YXAFI5NWCM5O3773POJ245UL4U')]"
         },        
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
@@ -262,7 +262,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering-existing.json?token=AE7OLVO3R5EWFMTJJNQDPA244J4RC')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering-existing.json?token=AE6YXAFXZTEPOQGOBRGATWS45UMCK')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -292,7 +292,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE7OLVPVVV2CAUILMH56T4C44KAAO')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE6YXAGNBCEETVN74QJT6UC45UMEO')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -325,7 +325,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVOFVSX6GM6YKDVR3BK44J4QQ')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE6YXAG5EURVJTGR7J7KSGC45UMHK')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -352,7 +352,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE7OLVOFVSX6GM6YKDVR3BK44J4QQ')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE6YXAG5EURVJTGR7J7KSGC45UMHK')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -379,7 +379,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json?token=AE7OLVNHV3PTEPOHRMNLGP244J4RK')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json?token=AE6YXACPBKTMLXX4KHBCFTK45UMMY')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -412,7 +412,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE7OLVLYMTI2TLPVIU7JOQK44J4RO')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE6YXAFQIGSXKIVQWZVQBS245UMOU')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -442,7 +442,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json?token=AE7OLVI765KV4KHT57DZKDC44PHYS')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json?token=AE6YXACNX2ICGXNRZKM3B4C45UMQ6')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -484,7 +484,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE7OLVLSFTYEZDIDFBTR2SK44PHYW')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE6YXAGW5TGMMW2A5E5HUMK45UMSY')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
