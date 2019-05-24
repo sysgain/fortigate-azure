@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "principalId": {
+      "type": "string"
+    },
+    "roleNameGuid": {
+      "type": "string"
+    },
+    "roleNameGuid1":{
+        "type": "string"
+    }
+  },
+  "variables": {
+    "Network Contributor":"[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4d97b98b-1d4f-4787-a291-c67834d212e7')]",
+    "Virtual Machine Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
+    "scope": "[resourceGroup().id]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2017-05-01",
+      "name": "[parameters('roleNameGuid')]",
+      "properties": {
+        "roleDefinitionId": "[variables('Network Contributor')]",
+        "principalId": "[parameters('principalId')]",
+        "scope": "[variables('scope')]"
+      }
+    },
+    {
+        "type": "Microsoft.Authorization/roleAssignments",
+        "apiVersion": "2017-05-01",
+        "name": "[parameters('roleNameGuid1')]",
+        "properties": {
+          "roleDefinitionId": "[variables('Virtual Machine Contributor')]",
+          "principalId": "[parameters('principalId')]",
+          "scope": "[variables('scope')]"
+        }
+      }
+  ]
+}
