@@ -222,7 +222,7 @@
             "ClientSecret":"[parameters('ClientSecret')]",
             "subscriptionID":"[subscription().subscriptionId]",
             "rgName":"[variables('rgName')]",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh?token=AE6YXAEOTUQ4RTICNJV2ROK45ULWG')]",
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh')]",
             "osDiskName1":"[concat('wlOsDisk-1',variables('suffix'))]",
             "osDiskName2":"[concat('wlOsDisk-2',variables('suffix'))]"
         },
@@ -244,8 +244,8 @@
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
             "ubuntuOSVersion": "16.04-LTS",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh?token=AE6YXAG2CKJA3DCGNMOHACK45UL2M')]",
-            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh?token=AE6YXAFI5NWCM5O3773POJ245UL4U')]"
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh')]",
+            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh')]"
         },        
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
@@ -262,7 +262,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering-existing.json?token=AE6YXAFXZTEPOQGOBRGATWS45UMCK')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering-existing.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -292,7 +292,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json?token=AE6YXAGNBCEETVN74QJT6UC45UMEO')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/vnetpeering.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -325,7 +325,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE6YXAG5EURVJTGR7J7KSGC45UMHK')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -352,7 +352,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json?token=AE6YXAG5EURVJTGR7J7KSGC45UMHK')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/fortigate.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -379,7 +379,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json?token=AE6YXACPBKTMLXX4KHBCFTK45UMMY')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -412,7 +412,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/workload.json?token=AE6YXAFQIGSXKIVQWZVQBS245UMOU')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/workload.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -442,7 +442,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json?token=AE6YXACNX2ICGXNRZKM3B4C45UMQ6')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -484,7 +484,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json?token=AE6YXAGW5TGMMW2A5E5HUMK45UMSY')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
