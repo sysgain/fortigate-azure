@@ -69,7 +69,7 @@
                 "description":"Provide password of the service principle"
             }
         },
-        "ExistingspokeVNet":{
+        "ExistingspokeVnet":{
             "type": "string",
             "defaultValue": "",
             "allowedValues": [
@@ -81,21 +81,21 @@
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVNet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
+                "description":"If you choose ExistingspokeVnet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetName":{
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVNet as YES, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
+                "description":"If you choose ExistingspokeVnet as YES, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetPrefix":{
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVNet as YES, then provide the Address prefix of the existing subnet.Otherwise keep the default value as it is"
+                "description":"If you choose ExistingspokeVnet as YES, then provide the Address prefix of the existing subnet.Otherwise keep the default value as it is"
             }
         },
         "fabricConnectorWorkloadAddressName":{
@@ -112,7 +112,7 @@
                 "description":"Provide the name of teh FortiGate firewall address name"
             }
         },
-        "hubFotigateVNetCIDR":{
+        "hubFotigateVnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.0.0/16",
             "metadata": {
@@ -180,7 +180,7 @@
             "location": "[variables('location')]",
             "networkApiVersion": "2016-03-30",
             "virtualNetworkName": "[concat('ForiGateVNET',variables('suffix'))]",
-            "addressPrefix": "[parameters('hubFotigateVNetCIDR')]",
+            "addressPrefix": "[parameters('hubFotigateVnetCIDR')]",
             "subnet1Name": "[concat('PublicFacingSubnet',variables('suffix'))]",
             "subnet1Prefix": "[parameters('FortiGatePublicFacingSubnetCIDR')]",
             "subnet2Name": "[concat('InternalSubnet',variables('suffix'))]",
@@ -302,7 +302,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "vnetPeeringExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -332,7 +332,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "vnetPeeringNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -362,7 +362,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "fortigateVM",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "dependsOn": [
                 "vnetpeeringExisting"
             ],
@@ -389,7 +389,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "fortigateVM1",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
                 "vnetpeeringNew"
             ],
@@ -416,7 +416,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "workloadVMExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "dependsOn": [
                 "vnetpeeringExisting"
             ],
@@ -449,7 +449,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "workloadVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
                 "vnetpeeringNew"
             ],
@@ -479,7 +479,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "EndUserVMExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "dependsOn": [
                 "workloadVMExisting"
             ],
@@ -521,7 +521,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "EndUserVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
                 "workloadVMNew"
             ],
@@ -556,12 +556,12 @@
     ],
     "outputs": {
         "fortigateWebURL": { 
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "type": "string",
             "value": "[concat('https://',reference('fortigateVM').outputs.fortigateFQDN.value)]"
         },
         "fortigateWebURL1": {
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
             "value": "[concat('https://',reference('fortigateVM1').outputs.fortigateFQDN.value)]"
         },
@@ -582,12 +582,12 @@
             "value": "[parameters('adminPassword')]"
         },
         "EndUserVMPublicDNS":{
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "type": "string",
             "value": "[reference('EndUserVMExisting').outputs.enduserFQDN.value]"
         },
         "EndUserVMPublicDNS1":{
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('EndUserVMNew').outputs.enduserFQDN.value]"
         },
@@ -600,17 +600,17 @@
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
         },
         "WorkloadVMPrivateIPAddress":{
-            "condition": "[equals(parameters('ExistingspokeVNet'),'Yes')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "type": "string",
             "value": "[reference('workloadVMExisting').outputs.WorkloadVMPrivateIPAddress1.value]"
         },
         "WorkloadVMPrivateIPAddress1":{
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress1.value]"
         },
         "WorkloadVMPrivateIPAddress2":{
-            "condition": "[equals(parameters('ExistingspokeVNet'),'No')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress2.value]"
         }   
