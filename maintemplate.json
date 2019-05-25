@@ -16,27 +16,6 @@
                 "description": "Password for fortigate Virtual Machine,make a note of the Password this will be used further."
             }
         },
-        "principalId":{
-            "type": "securestring",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Provide the object id of the logged in user/A user with owner permissions."
-            }
-        },
-        "roleNameGuid":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Provide the guid prefix for the runbook job to be created. Generate using https://www.guidgenerator.com/online-guid-generator.aspx"
-            }
-        },
-        "roleNameGuid1":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "Provide the guid prefix for the runbook job to be created. Generate using https://www.guidgenerator.com/online-guid-generator.aspx"
-            }
-        },
         "fortigateVMSize": {
             "type": "string",
             "defaultValue": "Standard_F1",
@@ -275,29 +254,6 @@
         "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
     "resources": [
-        {
-            "type": "Microsoft.Resources/deployments",
-            "name": "RoleAssignment",
-            "apiVersion": "[variables('deploymentApiVersion')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/role-assignment.json?token=AE7OLVJ7V6UD4LAUEXTW7F246E43G')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "principalId": {
-                        "value": "[parameters('principalId')]"
-                    },                 
-                    "roleNameGuid": {
-                        "value": "[parameters('roleNameGuid')]"
-                    },                 
-                    "roleNameGuid1": {
-                        "value": "[parameters('roleNameGuid1')]"
-                    }
-                }
-            }
-        },
         {
             "type": "Microsoft.Resources/deployments",
             "name": "vnetPeeringExisting",
