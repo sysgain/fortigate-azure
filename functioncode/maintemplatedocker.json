@@ -8,6 +8,9 @@
         "functionAppName" : {
             "type" : "String"
         },
+        "appInsightsName" : {
+            "type" : "String"
+        },
         "storageName": {
             "type": "String"
         }
@@ -16,6 +19,7 @@
         "storageAccountsApiVersion" : "2018-07-01",
         "WebHostingApiVersion" : "2016-03-01",
         "WebSitesApiVersion" : "2016-03-01",
+        "appInsightsApiVersion" : "2015-05-01",
         "storageAccountType" : "Standard_LRS",
         "storageAccountKind" : "StorageV2",
         "appServicePlanSku" : "Basic",
@@ -26,6 +30,8 @@
         "hostingEnvironment" : "",
         "WebHostingkind" : "linux",
         "WebSiteskind" : "functionapp",
+        "appInsightskind" : "web",
+        "applicationType" : "web",
         "reserved" : "true",
         "functionWorkerRuntime" : "python",
         "webSiteNodeDefaultVersion" : "10.14.1",
@@ -35,7 +41,6 @@
         "dockerRegistryURL" : "registry.hub.docker.com",
         "dockerRegistryUser" : "vivek225",
         "dockerRegistryPassword" : "v!vek@225"
-
     },
     "resources": [
         {
@@ -65,6 +70,20 @@
                 "numberOfWorkers": "[variables('numberOfWorkers')]",
                 "reserved": "[variables('reserved')]",
                 "hostingEnvironment": "[variables('hostingEnvironment')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('appInsightsApiVersion')]",
+            "name": "[parameters('appInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "[variables('appInsightskind')]",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionAppName'))]" : "Resource"
+            },
+            "properties": {
+                "Application_Type": "[variables('applicationType')]",
+                "ApplicationId": "[parameters('functionAppName')]"
             }
         },
         {
@@ -112,6 +131,10 @@
                     {
                         "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                         "value": "[variables('appServiceStroage')]"
+                    },
+                    {
+                        "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                        "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]"
                     }
             ],
                     "linuxFxVersion": "[variables('linuxFxVerison')]"
