@@ -1,219 +1,589 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "adminUsername": {
-      "type": "string",
-      "defaultValue": "adminuser",
-      "metadata": {
-        "description": "User name for the Virtual Machine."
-      }
-    },
-    "authenticationType": {
-      "type": "string",
-      "defaultValue": "password",
-      "allowedValues": [
-        "sshPublicKey",
-        "password"
-      ],
-      "metadata": {
-        "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
-      }
-    },
-    "adminPasswordOrKey": {
-      "type": "securestring",
-      "defaultValue": "Password@1234",
-      "metadata": {
-        "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
-      }
-    },
-    "dnsLabelPrefix": {
-      "type": "string",
-      "defaultValue": "testmode",
-      "metadata": {
-        "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
-      }
-    },
-    "ubuntuOSVersion": {
-      "type": "string",
-      "defaultValue": "16.04.0-LTS",
-      "allowedValues": [
-        "12.04.5-LTS",
-        "14.04.5-LTS",
-        "16.04.0-LTS",
-        "18.04-LTS"
-      ],
-      "metadata": {
-        "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources."
-      }
-    }
-  },
-  "variables": {
-    "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'salinuxvm')]",
-    "imagePublisher": "Canonical",
-    "imageOffer": "UbuntuServer",
-    "nicName": "myVMNic",
-    "addressPrefix": "10.0.0.0/16",
-    "subnetName": "Subnet",
-    "subnetPrefix": "10.0.0.0/24",
-    "storageAccountType": "Standard_LRS",
-    "publicIPAddressName": "myPublicIP",
-    "publicIPAddressType": "Dynamic",
-    "vmName": "MyUbuntuVM",
-    "vmSize": "Standard_A1",
-    "virtualNetworkName": "MyVNET",
-    "linuxConfiguration": {
-      "disablePasswordAuthentication": true,
-      "ssh": {
-        "publicKeys": [
-          {
-            "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-            "keyData": "[parameters('adminPasswordOrKey')]"
-          }
-        ]
-      }
-    },
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('storageAccountName')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "[variables('storageAccountType')]"
-      },
-      "kind": "Storage",
-      "properties": {}
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "adminuser",
+            "metadata": {
+                "description": "Username for fortigate Virtual Machine, make a note of the Username this will be used further"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "Password@1234",
+            "metadata": {
+                "description": "Password for fortigate Virtual Machine,make a note of the Password this will be used further."
+            }
+        },
+        "fortigateVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_F1",
+            "allowedValues": [
+                "Standard_F1",
+                "Standard_F16s",
+                "Standard_F1s",
+                "Standard_F2",
+                "Standard_F2s",
+                "Standard_F4",
+                "Standard_F4s",
+                "Standard_F8",
+                "Standard_F8s"
+            ],
+            "metadata": {
+                "description": "Fortigate Virtual Machine size(If you select any other size than the default one the cost will be more)"
+            }
+        },
+        "clientID":{
+            "type": "string",
+            "defaultValue": "39d65b6f-079c-4c03-bdc1-a91505a11032",
+            "metadata": {
+                "description":"Provide application ID of the service principle which crated earlier"
+            }
+        },
+        "ClientSecret":{
+            "type": "securestring",
+            "defaultValue": "Password@1234",
+            "metadata": {
+                "description":"Provide password of the service principle"
+            }
+        },
+        "fabricConnectorWorkloadAddressName":{
+            "type": "string",
+            "defaultValue": "testip",
+            "metadata": {
+                "description":"Provide the name of the fabric connector address"
+            }
+        },
+        "fabricConnectorFirewallAddressName":{
+            "type": "string",
+            "defaultValue": "firewallip",
+            "metadata": {
+                "description":"Provide the name of teh FortiGate firewall address name"
+            }
+        },
+        "hubFotigateVnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description":"Provide the CIDR address for FortiGate vnet(Hub vnet)"
+            }
+        },
+        "FortiGatePublicFacingSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description":"Provide the CIDR address for FortiGate public facing subnet"
+            }
+        },
+        "FortiGateInsideSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description":"Provide the CIDR address for FortiGate internal(private facing) subnet"
+            }
+        },
+        "FortiGatePublicFacingSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.0.4",
+            "metadata": {
+                "description":"Provide the static address of public facing subnet"
+            }
+        },
+        "FortiGateInsideSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.1.4",
+            "metadata": {
+                "description":"Provide the statis address of internal(private facing) subnet"
+            }
         }
-      }
     },
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('addressPrefix')]"
-          ]
+    "variables": {
+        "apiVersions": {
+            "deploymentApiVersion": "2016-02-01",
+            "computeApiVersion": "2018-06-01",
+            "networkApiVersion": "2017-09-01",
+            "routtableApiVersion": "2015-06-15"
         },
-        "subnets": [
-          {
-            "name": "[variables('subnetName')]",
+        "networkSettings": {
+            "location": "[variables('location')]",
+            "networkApiVersion": "2016-03-30",
+            "virtualNetworkName": "[concat('ForiGateVNET',variables('suffix'))]",
+            "addressPrefix": "[parameters('hubFotigateVnetCIDR')]",
+            "subnet1Name": "[concat('PublicFacingSubnet',variables('suffix'))]",
+            "subnet1Prefix": "[parameters('FortiGatePublicFacingSubnetCIDR')]",
+            "subnet2Name": "[concat('InternalSubnet',variables('suffix'))]",
+            "subnet2Prefix": "[parameters('FortiGateInsideSubnetCIDR')]"
+        },
+        "fortigateFirewallSettings": {
+            "location": "[variables('location')]",
+            "fortiAvailName": "[concat('forti-avset',variables('suffix'))]",
+            "FGPubFacingAddress": "[parameters('FortiGatePublicFacingSubnetAddress')]",
+            "FGDMZAddress": "[parameters('FortiGateInsideSubnetAddress')]",
+            "fortiPublicIPAddressName": "[concat('forti-pip',variables('suffix'))]",
+            "publicIPAddressType": "Dynamic",
+            "FortiGateName": "[concat('fortigateVM',variables('suffix'))]",
+            "fortiNicName1": "[concat('forti-nic-1',variables('suffix'))]",
+            "fortiNicName2": "[concat('forti-nic-2',variables('suffix'))]",
+            "sku": "fortinet_fg-vm_payg",
+            "version": "6.0.4",
+            "product": "fortinet_fortigate-vm_v5",
+            "publisher": "fortinet",
+            "fortigateVMSize": "[parameters('fortigateVMSize')]",
+            "storageAccountType": "Standard_LRS",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "fortiDnsLabelPrefix": "[concat('fortigate',variables('suffix'))]",
+            "routeTable1Name": "[concat('fortigate', '-', variables('networkSettings').subnet1Name,'-routes')]",
+            "routeTable2Name": "[concat('fortigate', '-', variables('networkSettings').subnet2Name,'-routes')]",
+            "networkSecurityGroupName":"[concat('fortigatensg',variables('suffix'))]",
+            "userData": "[concat('config system sdn-connector \n edit \"fg-azure-sdn\" \n set status enable \n set type azure \n set tenant-id \"',subscription().tenantId,'\" \n set subscription-id \"',subscription().subscriptionId,'\" \n set client-id \"',parameters('clientID'),'\" \n set client-secret \"',parameters('clientSecret'),'\" \n set resource-group \"', variables('rgName'),'\" \n set azure-region global \n set update-interval 60 \n end \n config firewall address \n edit \"',parameters('fabricConnectorWorkloadAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=web\" \n next \n end \n config firewall address \n edit \"',parameters('fabricConnectorFirewallAddressName'),'\" \n set type dynamic \n set comment ','',' \n set visibility enable \n set associated-interface ','', '\n set color 0 \n set sdn azure \n set filter \"tag.displayName=firewall\" \n next \n end \n config firewall policy \n edit 0 \n set name \"outbound\" \n set srcintf \"port2\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set nat enable \n next \n end \n config firewall vip \n edit ssh-wl \n set extintf \"port1\" \n set extip \"',parameters('FortiGatePublicFacingSubnetAddress'),'\" \n set mappedip \"172.1.0.4\" \n set portforward enable \n set protocol tcp \n set extport 2222 \n set mappedport 22 \n end \n config firewall vip \n edit web-ip \n set extintf \"port1\" \n set extip \"',parameters('FortiGatePublicFacingSubnetAddress'),'\" \n set mappedip \"172.1.0.4\" \n set portforward enable \n set protocol tcp \n set extport 8888 \n set mappedport 8888 \n end \n config firewall policy \n edit 0 \n set name \"ssh-workload-policy\" \n set srcintf \"port1\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"ssh-wl\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set logtraffic all \n set nat enable \n next \n end \n config firewall policy \n edit 0 \n set name \"web-policy\" \n set srcintf \"port1\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"web-ip\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set logtraffic all \n set nat enable \n next \n end \n config firewall policy \n edit 0 \n set name \"internet-inbound-policy\" \n set srcintf \"port1\" \n set dstintf \"port1\" \n set srcaddr \"all\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set logtraffic all \n set nat enable \n next \n end \n config firewall DoS-policy \n edit 0 \n set status disable \n set interface \"port1\" \n set srcaddr all \n set dstaddr \"testip\" \n set service ALL \n config anomaly \n edit \"tcp_syn_flood\" \n set status disable \n set log enable \n set action block \n set threshold 300 \n next \n end \n end \n config firewall policy \n edit 0 \n set name \"blocking-url-policy\" \n set srcintf \"port1\" \n set dstintf \"port1\" \n set srcaddr \"',parameters('fabricConnectorWorkloadAddressName'),'\" \n set dstaddr \"all\" \n set action accept \n set schedule \"always\" \n set service \"ALL\" \n set logtraffic securityevents \n set webfilter-profile \"default\" \n set profile-protocol-options \"default\" \n set ssl-ssh-profile \"certificate-inspection\" \n set nat enable \n set status disable \n next \n end')]"
+         },
+        "EndUserVMSettings": {
+            "vnetName": "[concat('enduserVNET',variables('suffix'))]",
+            "subnetName": "[concat('endusersubnet',variables('suffix'))]",
+            "addressPrefix": "10.5.0.0/16",
+            "subnetPrefix": "10.5.1.0/24",
+            "pipName": "[concat('enduserpip',variables('suffix'))]",
+            "publicIPAddressType": "Dynamic",
+            "nsgName":"[concat('endusernsg',variables('suffix'))]",
+            "dnsLabelPrefix": "[concat('enduserdns',variables('suffix'))]",
+            "location": "[variables('location')]",
+            "nicName": "[concat('enduser-nic',variables('suffix'))]",
+            "VmName": "[concat('enduserVM',variables('suffix'))]",
+            "vmSize": "Standard_DS1_v2",
+            "Username": "[parameters('adminUsername')]",
+            "Password": "[parameters('adminPassword')]",
+            "imagePublisher": "Canonical",
+            "imageOffer": "UbuntuServer",
+            "ubuntuOSVersion": "16.04-LTS"
+        },        
+        "location": "[resourceGroup().location]",
+        "deploymentApiVersion": "2016-02-01",
+        "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
+        "rgName":"[resourceGroup().name]",
+        "vnetIdend": "[resourceId('Microsoft.Network/virtualNetworks', variables('EndUserVMSettings').vnetName)]",
+        "subnetRefend": "[concat(variables('vnetIdend'), '/subnets/', variables('EndUserVMSettings').subnetName)]",
+        "vnetId": "[resourceId(variables('rgName'), 'Microsoft.Network/virtualNetworks', variables('networkSettings').virtualNetworkName)]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('networkSettings').subnet1Name)]",
+        "subnet1Ref": "[concat(variables('vnetId'), '/subnets/', variables('networkSettings').subnet2Name)]",
+        "routeTable1Id": "[resourceId('Microsoft.Network/routeTables',variables('fortigateFirewallSettings').routeTable1Name)]",
+        "routeTable2Id": "[resourceId('Microsoft.Network/routeTables',variables('fortigateFirewallSettings').routeTable2Name)]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/routeTables",
+            "name": "[variables('fortigateFirewallSettings').routeTable1Name]",
+            "apiVersion": "[variables('apiVersions').routtableApiVersion]",
+            "location": "[variables('fortigateFirewallSettings').location]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+                "routes": [
+                    {
+                        "name": "[concat('to', '-', variables('networkSettings').subnet2Name)]",
+                        "properties": {
+                            "addressPrefix": "[variables('networkSettings').subnet2Prefix]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
+                        }
+                    }
+                ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-11-01",
-      "name": "[variables('nicName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "name": "[variables('fortigateFirewallSettings').routeTable2Name]",
+            "apiVersion": "[variables('apiVersions').routtableApiVersion]",
+            "location": "[variables('fortigateFirewallSettings').location]",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              }
+                "routes": [
+                    {
+                        "name": "[concat('to', '-', variables('networkSettings').subnet1Name)]",
+                        "properties": {
+                            "addressPrefix": "[variables('networkSettings').subnet1Prefix]",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "[variables('fortigateFirewallSettings').FGDMZAddress]"
+                        }
+                    },
+                    {
+                        "name": "to-Internet",
+                        "properties": {
+                            "AddressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIPAddress": "[variables('fortigateFirewallSettings').FGDMZAddress]"
+                        }
+                    }
+                ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2018-10-01",
-      "name": "[variables('vmName')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-        "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[variables('vmSize')]"
         },
-        "osProfile": {
-          "computerName": "[variables('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPasswordOrKey')]",
-          "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "[variables('imagePublisher')]",
-            "offer": "[variables('imageOffer')]",
-            "sku": "[parameters('ubuntuOSVersion')]",
-            "version": "latest"
-          },
-          "osDisk": {
-            "createOption": "FromImage"
-          },
-          "dataDisks": [
-            {
-              "diskSizeGB": 1023,
-              "lun": 0,
-              "createOption": "Empty"
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('networkSettings').virtualNetworkName]",
+            "apiVersion": "[variables('apiVersions').networkApiVersion]",
+            "location": "[variables('networkSettings').location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/routeTables/', variables('fortigateFirewallSettings').routeTable1Name)]",
+                "[concat('Microsoft.Network/routeTables/', variables('fortigateFirewallSettings').routeTable2Name)]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('networkSettings').addressPrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('networkSettings').subnet1Name]",
+                        "properties": {
+                            "addressPrefix": "[variables('networkSettings').subnet1Prefix]",
+                            "routeTable": {
+                                "id": "[variables('routeTable1Id')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('networkSettings').subnet2Name]",
+                        "properties": {
+                            "addressPrefix": "[variables('networkSettings').subnet2Prefix]",
+                            "routeTable": {
+                                "id": "[variables('routeTable2Id')]"
+                            }
+                        }
+                    }
+                ]
             }
-          ]
         },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('fortigateFirewallSettings').fortiAvailName]",
+            "apiVersion": "[variables('apiVersions').computeApiVersion]",
+            "location": "[variables('fortigateFirewallSettings').location]",
+            "properties": {
+                "platformFaultDomainCount": "2",
+                "platformUpdateDomainCount": "2"
+            },
+            "sku": {
+                "name": "Aligned"
             }
-          ]
         },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": true,
-            "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName')), '2016-01-01').primaryEndpoints.blob)]"
-          }
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('fortigateFirewallSettings').fortiPublicIPAddressName]",
+            "apiVersion": "[variables('apiVersions').routtableApiVersion]",
+            "location": "[variables('fortigateFirewallSettings').location]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('fortigateFirewallSettings').publicIPAddressType]",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('fortigateFirewallSettings').fortiDnsLabelPrefix]"
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersions').routtableApiVersion]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('fortigateFirewallSettings').fortiNicName1]",
+            "location": "[variables('fortigateFirewallSettings').location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('fortigateFirewallSettings').fortiPublicIPAddressName)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[variables('fortigateFirewallSettings').FGPubFacingAddress]",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('fortigateFirewallSettings').fortiPublicIPAddressName)]"
+                            }
+                        }
+                    }
+                ],
+                "enableIPForwarding": true
+            }
+        },
+        {
+            "apiVersion": "[variables('apiVersions').routtableApiVersion]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('fortigateFirewallSettings').fortiNicName2]",
+            "location": "[variables('fortigateFirewallSettings').location]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('fortigateFirewallSettings').fortiPublicIPAddressName)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[variables('fortigateFirewallSettings').FGDMZAddress]",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ],
+                "enableIPForwarding": true
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('fortigateFirewallSettings').FortiGateName]",
+            "apiVersion": "[variables('apiVersions').computeApiVersion]",
+            "location": "[variables('fortigateFirewallSettings').location]",
+            "tags": {
+                "displayName": "firewall"
+            },
+            "plan": {
+                "name": "[variables('fortigateFirewallSettings').sku]",
+                "publisher": "[variables('fortigateFirewallSettings').publisher]",
+                "product": "[variables('fortigateFirewallSettings').product]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('fortigateFirewallSettings').fortiNicName1)]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('fortigateFirewallSettings').fortiNicName2)]",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('fortigateFirewallSettings').fortiAvailName)]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('fortigateFirewallSettings').fortigateVMSize]"
+                },
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('fortigateFirewallSettings').fortiAvailName)]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('fortigateFirewallSettings').FortiGateName]",
+                    "adminUsername": "[variables('fortigateFirewallSettings').adminUsername]",
+                    "adminPassword": "[variables('fortigateFirewallSettings').adminPassword]",
+                    "customData": "[base64(variables('fortigateFirewallSettings').userData)]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('fortigateFirewallSettings').publisher]",
+                        "offer": "[variables('fortigateFirewallSettings').product]",
+                        "sku": "[variables('fortigateFirewallSettings').sku]",
+                        "version": "[variables('fortigateFirewallSettings').version]"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                       
+                    },
+                    "dataDisks": [
+                        {
+                            "diskSizeGB": "30",
+                            "lun": 0,
+                            "createOption": "Empty"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "properties": {
+                                "primary": true
+                            },
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('fortigateFirewallSettings').fortiNicName1)]"
+                        },
+                        {
+                            "properties": {
+                                "primary": false
+                            },
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('fortigateFirewallSettings').fortiNicName2)]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-04-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('EndUserVMSettings').vnetName]",
+            "location": "[variables('EndUserVMSettings').location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('EndUserVMSettings').addressPrefix]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('EndUserVMSettings').subnetName]",
+                        "properties": {
+                            "addressPrefix": "[variables('EndUserVMSettings').subnetPrefix]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2017-04-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('EndUserVMSettings').pipName]",
+            "location": "[variables('EndUserVMSettings').location]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('EndUserVMSettings').publicIPAddressType]",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('EndUserVMSettings').dnsLabelPrefix]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-04-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('EndUserVMSettings').nicName]",
+            "location": "[variables('EndUserVMSettings').location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('EndUserVMSettings').pipName)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('EndUserVMSettings').pipName)]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRefend')]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('EndUserVMSettings').nsgName)]"
+                }
+            }
+        },
+        {
+            "name": "[variables('EndUserVMSettings').nsgName]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2018-01-01",
+            "location": "[variables('EndUserVMSettings').location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow-ssh",
+                        "properties": {
+                            "description": "Allow SSH",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "allow-http",
+                        "properties": {
+                            "description": "Allow http",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "allow-http1",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 102,
+                            "direction": "Outbound"
+                        }
+                    },
+                    {
+                        "name": "web-rule",
+                        "properties": {
+                            "description": "Allow WEB",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1001,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "web-rule1",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1002,
+                            "direction": "Outbound"
+                        }
+                    }
+                   
+                ]
+            }
+        },
+        {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('EndUserVMSettings').VmName]",
+            "location": "[variables('EndUserVMSettings').location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('EndUserVMSettings').nicName)]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('EndUserVMSettings').vmSize]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('EndUserVMSettings').VmName]",
+                    "adminUsername": "[variables('EndUserVMSettings').Username]",
+                    "adminPassword": "[variables('EndUserVMSettings').Password]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('EndUserVMSettings').imagePublisher]",
+                        "offer": "[variables('EndUserVMSettings').imageOffer]",
+                        "sku": "[variables('EndUserVMSettings').ubuntuOSVersion]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('EndUserVMSettings').nicName)]"
+                        }
+                    ]
+                }
+            }
         }
-      }
-    }
-  ],
-  "outputs": {
-    "hostname": {
-      "type": "string",
-      "value": "[reference(variables('publicIPAddressName')).dnsSettings.fqdn]"
+    ],
+"outputs": {
+    "fortigateFQDN": {
+        "type": "string",
+        "value": "[reference(variables('fortigateFirewallSettings').fortiPublicIPAddressName).dnsSettings.fqdn]"
     },
-    "sshCommand": {
-      "type": "string",
-      "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')).dnsSettings.fqdn)]"
+    "enduserFQDN": {
+            "type": "string",
+            "value": "[reference(variables('EndUserVMSettings').pipName).dnsSettings.fqdn]"
+        }
     }
-  }
 }
