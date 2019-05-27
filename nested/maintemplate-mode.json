@@ -262,7 +262,7 @@
             "dependsOn": [
             ],
             "properties": {
-                "mode":"complete",
+                "mode": "Complete",
                 "templateLink": {
                     "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json')]",
                     "contentVersion": "1.0.0.0"
@@ -303,7 +303,7 @@
             "dependsOn": [
             ],
             "properties": {
-                "mode":"complete",
+                "mode": "Complete",
                 "templateLink": {
                     "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json')]",
                     "contentVersion": "1.0.0.0"
