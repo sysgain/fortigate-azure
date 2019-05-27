@@ -4,14 +4,14 @@
     "parameters": {
         "adminUsername": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "adminuser",
             "metadata": {
                 "description": "Username for fortigate Virtual Machine, make a note of the Username this will be used further"
             }
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "",
+            "defaultValue": "Password@1234",
             "metadata": {
                 "description": "Password for fortigate Virtual Machine,make a note of the Password this will be used further."
             }
@@ -36,21 +36,21 @@
         },
         "clientID":{
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "39d65b6f-079c-4c03-bdc1-a91505a11032",
             "metadata": {
                 "description":"Provide application ID of the service principle which crated earlier"
             }
         },
         "ClientSecret":{
             "type": "securestring",
-            "defaultValue": "",
+            "defaultValue": "Password@1234",
             "metadata": {
                 "description":"Provide password of the service principle"
             }
         },
         "existingVnetName":{
             "type": "string",
-            "defaultValue": "NA",
+            "defaultValue": "existingvnet",
             "metadata": {
                 "description":"If you choose ExistingspokeVnet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
             }
