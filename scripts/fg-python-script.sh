@@ -53,4 +53,4 @@ wget "https://storageccqia.blob.core.windows.net/cc-iot/fortigate/FortiGate-Late
 
 touch cleanup1.log
 
-python3 enableRoute.py ${AppID} ${AppPassword} ${TenantID} ${SubscriptionID} ${RGName} ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${RouteTable} >> cleanup1.log 2>&1
+#python3 enableRoute.py ${AppID} ${AppPassword} ${TenantID} ${SubscriptionID} ${RGName} ${VNet} ${subnetname1} ${subnetname2} ${subnetaddprefix1} ${subnetaddprefix2} ${RouteTable} >> cleanup1.log 2>&1
