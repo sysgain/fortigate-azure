@@ -36,7 +36,7 @@
         "functionWorkerRuntime" : "python",
         "webSiteNodeDefaultVersion" : "10.14.1",
         "functionExtensionVersion" : "~2",
-        "linuxFxVerison" : "DOCKER|vivek225/dockerhttptrigger:v1.0.0",
+        "linuxFxVerison" : "DOCKER|vivek225/dockerhttptrigger:v4.0.0",
         "appServiceStroage" : "false",
         "dockerRegistryURL" : "registry.hub.docker.com",
         "dockerRegistryUser" : "vivek225",
@@ -135,6 +135,10 @@
                     {
                         "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                         "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), variables('appInsightsApiVersion')).InstrumentationKey]"
+                    },
+                    {
+                        "name": "RG",
+                        "value": "[resourceGroup().name]"
                     }
             ],
                     "linuxFxVersion": "[variables('linuxFxVerison')]"
