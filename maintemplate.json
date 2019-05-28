@@ -246,7 +246,38 @@
             "ubuntuOSVersion": "16.04-LTS",
             "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh')]",
             "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh')]"
-        },        
+        }, 
+        "AzureFunction":{  
+            "appServicePlanName":"[concat('appsvc',variables('suffix'))]",
+            "functionAppName":"[concat('funappdoc',variables('suffix'))]",
+            "storageName":"[concat('storageacc',variables('suffix'))]",
+            "appInsightsName":"[concat('fg-appinsights',variables('suffix'))]",
+            "storageAccountsApiVersion":"2018-07-01",
+            "WebHostingApiVersion":"2016-03-01",
+            "WebSitesApiVersion":"2016-03-01",
+            "appInsightsApiVersion":"2015-05-01",
+            "storageAccountType":"Standard_LRS",
+            "storageAccountKind":"StorageV2",
+            "appServicePlanSku":"Basic",
+            "appServicePlanSkuCode":"B1",
+            "workerSize":"0",
+            "workerSizeId":"0",
+            "numberOfWorkers":"1",
+            "hostingEnvironment":"",
+            "WebHostingkind":"linux",
+            "WebSiteskind":"functionapp",
+            "appInsightskind":"web",
+            "applicationType":"web",
+            "reserved":"true",
+            "functionWorkerRuntime":"python",
+            "webSiteNodeDefaultVersion":"10.14.1",
+            "functionExtensionVersion":"~2",
+            "linuxFxVerison":"DOCKER|vivek225/workloadhttptrigger:v1.0.0",
+            "appServiceStroage":"false",
+            "dockerRegistryURL":"registry.hub.docker.com",
+            "dockerRegistryUser":"vivek225",
+            "dockerRegistryPassword":"v!vek@225"
+         },        
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
@@ -370,39 +401,6 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "workloadVMExisting",
-            "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
-            "dependsOn": [
-                "vnetpeeringExisting"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/wlvm-existing.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "workloadsSettings": {
-                        "value": "[variables('workloadsSettings')]"
-                    },   
-                    "apiVersions": {
-                        "value": "[variables('apiVersions')]"
-                    },
-                    "existingVNetName":{
-                        "value":"[parameters('existingVNetName')]"
-                    },
-                    "existingSubnetName":{
-                        "value":"[parameters('existingSubnetName')]"
-                    },
-                    "adminUsername":{
-                        "value": "[parameters('adminUsername')]"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
             "name": "workloadVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
@@ -428,48 +426,6 @@
                     "adminUsername":{
                         "value": "[parameters('adminUsername')]"
                     }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "name": "EndUserVMExisting",
-            "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
-            "dependsOn": [
-                "workloadVMExisting"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM-existing.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "EndUserVMSettings":{
-                        "value":"[variables('EndUserVMSettings')]"
-                    },
-                    "workloadsSettings": {
-                        "value": "[variables('workloadsSettings')]"
-                    },   
-                    "existingVNetName":{
-                        "value":"[parameters('existingVNetName')]"
-                    },
-                    "existingSubnetName":{
-                        "value":"[parameters('existingSubnetName')]"
-                    },
-                    "existingSubnetPrefix":{
-                        "value":"[parameters('existingSubnetPrefix')]"
-                    },
-                    "adminUsername":{
-                        "value": "[parameters('adminUsername')]"
-                    },
-                    "clientID":{
-                        "value": "[parameters('clientID')]"
-                    },
-                    "ClientSecret":{
-                        "value": "[parameters('ClientSecret')]"
-                    }   
                 }
             }
         },
@@ -508,7 +464,34 @@
                     }   
                 }
             }
-        }      
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "functionApp",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "dependsOn": [
+                "workloadVMNew"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-with-docker.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "AzureFunction":{
+                        "value":"[variables('AzureFunction')]"
+                    },
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },   
+                    "wlNetworkSettings": {
+                        "value": "[variables('wlNetworkSettings')]"
+                    }
+                }
+            }
+        }    
     ],
     "outputs": {
         "fortigateWebURL": { 
@@ -537,11 +520,6 @@
             "type": "string",
             "value": "[parameters('adminPassword')]"
         },
-        "EndUserVMPublicDNS":{
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
-            "type": "string",
-            "value": "[reference('EndUserVMExisting').outputs.enduserFQDN.value]"
-        },
         "EndUserVMPublicDNS1":{
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
@@ -554,11 +532,6 @@
         "FortigateNic-1-IPAddress":{
             "type": "string",
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
-        },
-        "WorkloadVMPrivateIPAddress":{
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
-            "type": "string",
-            "value": "[reference('workloadVMExisting').outputs.WorkloadVMPrivateIPAddress1.value]"
         },
         "WorkloadVMPrivateIPAddress1":{
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
