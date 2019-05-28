@@ -2,17 +2,18 @@
     "$schema":"http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion":"1.0.0.0",
     "parameters":{  
-        "AzureFunction":{
-            "type": "object"
-        },
-        "workloadsSettings":{
-            "type": "object"
-        },
-        "wlNetworkSettings":{
-            "type": "object"
-        }
+       "AzureFunction":{  
+          "type":"object"
+       },
+       "workloadsSettings":{  
+          "type":"object"
+       },
+       "wlNetworkSettings":{  
+          "type":"object"
+       }
     },
     "variables":{  
+ 
     },
     "resources":[  
        {  
@@ -23,6 +24,20 @@
           "kind":"[parameters('AzureFunction').storageAccountKind]",
           "sku":{  
              "name":"[parameters('AzureFunction').storageAccountType]"
+          }
+       },
+       {  
+          "apiVersion":"2015-05-01",
+          "name":"[parameters('AzureFunction').appInsightsName]",
+          "type":"Microsoft.Insights/components",
+          "kind":"[parameters('AzureFunction').appInsightskind]",
+          "location":"[resourceGroup().location]",
+          "tags":{  
+             "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('AzureFunction').functionAppName)]":"Resource"
+          },
+          "properties":{  
+             "Application_Type":"[parameters('AzureFunction').applicationType]",
+             "ApplicationId":"[parameters('AzureFunction').functionAppName]"
           }
        },
        {  
@@ -90,74 +105,78 @@
                       "name":"WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                       "value":"[parameters('AzureFunction').appServiceStroage]"
                    },
-                   {
-                    "name":"VmName1",
-                    "value": "[parameters('workloadsSettings').virtualMachineName1]"
-                },
-                {
-                    "name":"VmName2",
-                    "value": "[parameters('workloadsSettings').virtualMachineName2]"
-                },
-                {
-                    "name":"Nic1",
-                    "value": "[parameters('workloadsSettings').nicName1]"
-                },
-                {
-                    "name":"Nic2",
-                    "value": "[parameters('workloadsSettings').nicName2]"
-                },
-                {
-                    "name":"NSG",
-                    "value": "[parameters('workloadsSettings').networkSecurityGroupName]"
-                },
-                {
-                    "name":"Disk1",
-                    "value": "[parameters('workloadsSettings').osDiskName1]"
-                },
-                {
-                    "name":"Disk2",
-                    "value": "[parameters('workloadsSettings').osDiskName2]"
-                },
-                {
-                    "name":"VNet",
-                    "value": "[parameters('wlNetworkSettings').virtualNetworkName]"
-                },
-                {
-                    "name":"RouteTable",
-                    "value": "[parameters('workloadsSettings').routeTableName]"
-                },
-                {
-                    "name":"subnetName1",
-                    "value": "[parameters('wlNetworkSettings').subnetName1]"
-                },
-                {
-                    "name":"subnetName2",
-                    "value": "[parameters('wlNetworkSettings').subnetName2]"
-                },
-                {
-                    "name":"toInternetDefaultRoute",
-                    "value": "to-InternetDefaultRoute"
-                },
-                {
-                    "name":"RGName",
-                    "value": "[resourceGroup().name]"
-                },
-                {
-                    "name": "AppID",
-                    "value": "[parameters('workloadsSettings').clientID]"
-                },
-                {
-                    "name": "AppPassword",
-                    "value": "[parameters('workloadsSettings').ClientSecret]"
-                },
-                {
-                    "name": "TenantID",
-                    "value": "[parameters('workloadsSettings').tenantID]"
-                },
-                {
-                    "name":"SubscriptionID",
-                    "value": "[parameters('workloadsSettings').subscriptionID]"
-                }
+                   {  
+                      "name":"VmName1",
+                      "value":"[parameters('workloadsSettings').virtualMachineName1]"
+                   },
+                   {  
+                      "name":"VmName2",
+                      "value":"[parameters('workloadsSettings').virtualMachineName2]"
+                   },
+                   {  
+                      "name":"Nic1",
+                      "value":"[parameters('workloadsSettings').nicName1]"
+                   },
+                   {  
+                      "name":"Nic2",
+                      "value":"[parameters('workloadsSettings').nicName2]"
+                   },
+                   {  
+                      "name":"NSG",
+                      "value":"[parameters('workloadsSettings').networkSecurityGroupName]"
+                   },
+                   {  
+                      "name":"Disk1",
+                      "value":"[parameters('workloadsSettings').osDiskName1]"
+                   },
+                   {  
+                      "name":"Disk2",
+                      "value":"[parameters('workloadsSettings').osDiskName2]"
+                   },
+                   {  
+                      "name":"VNet",
+                      "value":"[parameters('wlNetworkSettings').virtualNetworkName]"
+                   },
+                   {  
+                      "name":"RouteTable",
+                      "value":"[parameters('workloadsSettings').routeTableName]"
+                   },
+                   {  
+                      "name":"subnetName1",
+                      "value":"[parameters('wlNetworkSettings').subnetName1]"
+                   },
+                   {  
+                      "name":"subnetName2",
+                      "value":"[parameters('wlNetworkSettings').subnetName2]"
+                   },
+                   {  
+                      "name":"Route",
+                      "value":"to-InternetDefaultRoute"
+                   },
+                   {  
+                      "name":"RGName",
+                      "value":"[resourceGroup().name]"
+                   },
+                   {  
+                      "name":"AppID",
+                      "value":"[parameters('workloadsSettings').clientID]"
+                   },
+                   {  
+                      "name":"AppPassword",
+                      "value":"[parameters('workloadsSettings').ClientSecret]"
+                   },
+                   {  
+                      "name":"TenantID",
+                      "value":"[parameters('workloadsSettings').tenantID]"
+                   },
+                   {  
+                      "name":"SubscriptionID",
+                      "value":"[parameters('workloadsSettings').subscriptionID]"
+                   },
+                   {  
+                      "name":"APPINSIGHTS_INSTRUMENTATIONKEY",
+                      "value":"[reference(resourceId('microsoft.insights/components/', parameters('AzureFunction').appInsightsName), parameters('AzureFunction').appInsightsApiVersion).InstrumentationKey]"
+                   }
                 ],
                 "linuxFxVersion":"[parameters('AzureFunction').linuxFxVerison]"
              }
