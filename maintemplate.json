@@ -31,21 +31,21 @@
                 "Standard_F8s"
             ],
             "metadata": {
-                "description": "FortiGate virtual machine size(If you select any size other than the default one the cost will be more)"
+                "description": "FortiGate virtual machine size(if you select any size other than the default size the cost will be more)"
             }
         },
         "clientID":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"provide application ID of the service principal which created earlier.Which is used in automating the the Azure Fabric Connector."
+                "description":"provide application ID of the service principal.which is used to automate the Azure Fabric Connector creation"
             }
         },
         "clientSecret":{
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
-                "description":"provide password of the service principal.Which is used in automating the the Azure Fabric Connector."
+                "description":"provide password of the service principal.Which is used to automate the Azure Fabric Connector creation"
             }
         },
         "existingSpokeVnet":{
@@ -56,7 +56,7 @@
                 "No"
             ],
             "metadata": {
-                "description": "if you choose the Option for existingSpokeVnet as Yes make sure to choose the existing Resource group where the existing vnet was akready created."
+                "description": "This parameter will allow user to choose existing VNet or Create new VNet based on the values YES/NO.Note: You need to select the existing resource group while deploying the template if you choose Yes for Existing Vnet"
             }
         },
         "existingVnetName":{
@@ -91,28 +91,28 @@
             "type": "string",
             "defaultValue": "firewallip",
             "metadata": {
-                "description":"provide the name of teh FortiGate firewall address name"
+                "description":"provide the name of the FortiGate firewall address"
             }
         },
         "hubFotigateVnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.0.0/16",
             "metadata": {
-                "description":"provide the CIDR address for FortiGate vnet(Hub vnet)"
+                "description":"provide the CIDR for FortiGate VNet(Hub VNet)"
             }
         },
         "fortiGatePublicFacingSubnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.0.0/24",
             "metadata": {
-                "description":"provide the CIDR address for FortiGate public facing subnet"
+                "description":"provide the CIDR for FortiGate public facing subnet"
             }
         },
         "fortiGateInsideSubnetCIDR":{
             "type": "string",
             "defaultValue": "10.0.1.0/24",
             "metadata": {
-                "description":"provide the CIDR address for FortiGate internal(private facing) subnet"
+                "description":"provide the CIDR for FortiGate internal/private facing subnet"
             }
         },
         "fortiGatePublicFacingSubnetAddress":{
@@ -126,28 +126,28 @@
             "type": "string",
             "defaultValue": "10.0.1.4",
             "metadata": {
-                "description":"provide the statis address of internal(private facing) subnet"
+                "description":"provide the statis address of internal/private facing subnet"
             }
         },
         "spokeDemoVnetCIDR":{
             "type": "string",
             "defaultValue": "172.1.0.0/16",
             "metadata": {
-                "description":"provide the CIDR address for demo vnet(spoke)"
+                "description":"provide the CIDR for demo VNet(spoke)"
             }
         },
         "spokeDemoSubnetCIDR1":{
             "type": "string",
             "defaultValue": "172.1.0.0/24",
             "metadata": {
-                "description":"provide the CIDR address for demo subnet1(spoke1)"
+                "description":"provide the CIDR for demo subnet1(spoke1)"
             }
         },
         "spokeDemoSubnetCIDR2":{
             "type": "string",
             "defaultValue": "172.1.1.0/24",
             "metadata": {
-                "description":"provide the CIDR address for demo subnet2(spoke2)"
+                "description":"provide the CIDR for demo subnet2(spoke2)"
             }
         }
     },
@@ -246,9 +246,7 @@
             "Password": "[parameters('adminPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
-            "ubuntuOSVersion": "16.04-LTS",
-            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-python-script.sh')]",
-            "fileUri1":"[concat(variables('baseUrl'),'scripts/fg-python-existing-script.sh')]"
+            "ubuntuOSVersion": "16.04-LTS"
         }, 
         "AzureFunction":{  
             "appServicePlanName":"[concat('appsvc',variables('suffix'))]",
