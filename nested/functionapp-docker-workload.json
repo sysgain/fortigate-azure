@@ -12,63 +12,14 @@
           "type":"object"
        }
     },
-    "variables":{  
- 
-    },
+    "variables":{},
     "resources":[  
-       {  
-          "type":"Microsoft.Storage/storageAccounts",
-          "apiVersion":"[parameters('AzureFunction').storageAccountsApiVersion]",
-          "name":"[parameters('AzureFunction').storageName]",
-          "location":"[resourceGroup().location]",
-          "kind":"[parameters('AzureFunction').storageAccountKind]",
-          "sku":{  
-             "name":"[parameters('AzureFunction').storageAccountType]"
-          }
-       },
-       {  
-          "apiVersion":"2015-05-01",
-          "name":"[parameters('AzureFunction').appInsightsName]",
-          "type":"Microsoft.Insights/components",
-          "kind":"[parameters('AzureFunction').appInsightskind]",
-          "location":"[resourceGroup().location]",
-          "tags":{  
-             "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('AzureFunction').functionAppName)]":"Resource"
-          },
-          "properties":{  
-             "Application_Type":"[parameters('AzureFunction').applicationType]",
-             "ApplicationId":"[parameters('AzureFunction').functionAppName]"
-          }
-       },
-       {  
-          "type":"Microsoft.Web/serverfarms",
-          "apiVersion":"[parameters('AzureFunction').WebHostingApiVersion]",
-          "name":"[parameters('AzureFunction').appServicePlanName]",
-          "location":"[resourceGroup().location]",
-          "sku":{  
-             "Tier":"[parameters('AzureFunction').appServicePlanSku]",
-             "Name":"[parameters('AzureFunction').appServicePlanSkuCode]"
-          },
-          "kind":"[parameters('AzureFunction').WebHostingkind]",
-          "properties":{  
-             "name":"[parameters('AzureFunction').appServicePlanName]",
-             "workerSize":"[parameters('AzureFunction').workerSize]",
-             "workerSizeId":"[parameters('AzureFunction').workerSizeId]",
-             "numberOfWorkers":"[parameters('AzureFunction').numberOfWorkers]",
-             "reserved":"[parameters('AzureFunction').reserved]",
-             "hostingEnvironment":"[parameters('AzureFunction').hostingEnvironment]"
-          }
-       },
        {  
           "apiVersion":"[parameters('AzureFunction').WebSitesApiVersion]",
           "type":"Microsoft.Web/sites",
-          "name":"[parameters('AzureFunction').functionAppName]",
+          "name":"[parameters('AzureFunction').functionAppName1]",
           "location":"[resourceGroup().location]",
           "kind":"[parameters('AzureFunction').WebSiteskind]",
-          "dependsOn":[  
-             "[resourceId('Microsoft.Web/serverfarms', parameters('AzureFunction').appServicePlanName)]",
-             "[resourceId('Microsoft.Storage/storageAccounts', parameters('AzureFunction').storageName)]"
-          ],
           "properties":{  
              "serverFarmId":"[resourceId('Microsoft.Web/serverfarms', parameters('AzureFunction').appServicePlanName)]",
              "siteConfig":{  
@@ -142,14 +93,6 @@
                       "value":"[parameters('workloadsSettings').routeTableName]"
                    },
                    {  
-                      "name":"subnetName1",
-                      "value":"[parameters('wlNetworkSettings').subnetName1]"
-                   },
-                   {  
-                      "name":"subnetName2",
-                      "value":"[parameters('wlNetworkSettings').subnetName2]"
-                   },
-                   {  
                       "name":"Route",
                       "value":"to-InternetDefaultRoute"
                    },
@@ -178,7 +121,7 @@
                       "value":"[reference(resourceId('microsoft.insights/components/', parameters('AzureFunction').appInsightsName), parameters('AzureFunction').appInsightsApiVersion).InstrumentationKey]"
                    }
                 ],
-                "linuxFxVersion":"[parameters('AzureFunction').linuxFxVerison]"
+                "linuxFxVersion":"[parameters('AzureFunction').linuxFxVerison1]" 
              }
           }
        }
