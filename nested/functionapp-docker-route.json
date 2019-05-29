@@ -121,7 +121,7 @@
                    },
                    {  
                       "name":"Subnet2addressPrefix",
-                      "value":"[parameters('wlNetworkSettings').subnetPrefix1]"
+                      "value":"[parameters('wlNetworkSettings').subnetPrefix2]"
                    },
                    {  
                       "name":"RouteName",
