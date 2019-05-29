@@ -179,7 +179,6 @@
                    }
                 ],
                 "linuxFxVersion":"[parameters('AzureFunction').linuxFxVerison]"
-                
              }
           }
        }
