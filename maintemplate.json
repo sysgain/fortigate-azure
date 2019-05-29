@@ -31,21 +31,21 @@
                 "Standard_F8s"
             ],
             "metadata": {
-                "description": "FortiGate Virtual Machine size(If you select any other size than the default one the cost will be more)"
+                "description": "FortiGate Virtual Machine size(If you select any size other than the default one the cost will be more)"
             }
         },
         "clientID":{
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"Provide application ID of the service principle which crated earlier.Which is used to connect the Azure fabric connector."
+                "description":"Provide application ID of the service principal which created earlier.Which is used in automating the the Azure Fabric Connector."
             }
         },
         "ClientSecret":{
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
-                "description":"Provide password of the service principle"
+                "description":"Provide password of the service principal.Which is used in automating the the Azure Fabric Connector."
             }
         },
         "ExistingspokeVnet":{
@@ -196,7 +196,7 @@
             "storageAccountType": "Standard_LRS",
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
-            "fortiDnsLabelPrefix": "[concat('FortiGate',variables('suffix'))]",
+            "fortiDnsLabelPrefix": "[concat('fortigate',variables('suffix'))]",
             "routeTable1Name": "[concat('FortiGate', '-', variables('networkSettings').subnet1Name,'-routes')]",
             "routeTable2Name": "[concat('FortiGate', '-', variables('networkSettings').subnet2Name,'-routes')]",
             "networkSecurityGroupName":"[concat('FortiGatensg',variables('suffix'))]",
@@ -252,8 +252,8 @@
         }, 
         "AzureFunction":{  
             "appServicePlanName":"[concat('appsvc',variables('suffix'))]",
-            "functionAppName":"[concat('funappdoc',variables('suffix'))]",
-            "functionAppName1":"[concat('funapproute',variables('suffix'))]",
+            "functionAppName":"[concat('functionroute',variables('suffix'))]",
+            "functionAppName1":"[concat('functionworkload',variables('suffix'))]",
             "storageName":"[concat('storageacc',variables('suffix'))]",
             "appInsightsName":"[concat('fg-appinsights',variables('suffix'))]",
             "storageAccountsApiVersion":"2018-07-01",
@@ -276,8 +276,8 @@
             "functionWorkerRuntime":"python",
             "webSiteNodeDefaultVersion":"10.14.1",
             "functionExtensionVersion":"~2",
-            "linuxFxVerison":"DOCKER|vivek225/workloadhttptrigger:v1.0.0",
-            "linuxFxVersion1":"DOCKER|vivek225/routeupdatehttptrigger:v1.0.0",
+            "linuxFxVersion":"DOCKER|vivek225/routeupdatehttptrigger:v1.0.0",
+            "linuxFxVersion1":"DOCKER|vivek225/workloadhttptrigger:v1.0.0",
             "appServiceStroage":"false",
             "dockerRegistryURL":"registry.hub.docker.com",
             "dockerRegistryUser":"vivek225",
@@ -352,7 +352,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "FortiGateVM",
+            "name": "FortiGateVMExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "dependsOn": [
@@ -379,7 +379,7 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "FortiGateVM1",
+            "name": "FortiGateVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
@@ -472,7 +472,40 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "functionApp",
+            "name": "functionAppExistingroute",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "dependsOn": [
+                "vnetpeeringExisting"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-docker-route-existing.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "AzureFunction":{
+                        "value":"[variables('AzureFunction')]"
+                    },
+                    "workloadsSettings": {
+                        "value": "[variables('workloadsSettings')]"
+                    },
+                    "existingVnetName":{
+                        "value":"[parameters('existingVnetName')]"
+                    },
+                    "existingSubnetName":{
+                        "value":"[parameters('existingSubnetName')]"
+                    },
+                    "existingSubnetPrefix":{
+                        "value": "[parameters('existingSubnetPrefix')]"
+                    }  
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "functionAppNewroute",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
@@ -481,7 +514,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-with-docker.json')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-docker-route.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -499,16 +532,16 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "functionApproute",
+            "name": "functionAppworkload",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "dependsOn": [
-                "functionapp"
+                "functionAppNewroute"
             ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-docker-route.json')]",
+                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-docker-workload.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -529,12 +562,12 @@
         "FortiGateWebURL": { 
             "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
             "type": "string",
-            "value": "[concat('https://',reference('FortiGateVM').outputs.fortigateFQDN.value)]"
+            "value": "[concat('https://',reference('FortiGateVMExisting').outputs.fortigateFQDN.value)]"
         },
         "FortiGateWebURL1": {
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
-            "value": "[concat('https://',reference('FortiGateVM1').outputs.fortigateFQDN.value)]"
+            "value": "[concat('https://',reference('FortiGateVMNew').outputs.fortigateFQDN.value)]"
         },
         "webUIAdminUsername": {
             "type": "string",
