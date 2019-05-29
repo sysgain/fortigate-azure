@@ -41,14 +41,14 @@
                 "description":"Provide application ID of the service principal which created earlier.Which is used in automating the the Azure Fabric Connector."
             }
         },
-        "ClientSecret":{
+        "clientSecret":{
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
                 "description":"Provide password of the service principal.Which is used in automating the the Azure Fabric Connector."
             }
         },
-        "ExistingspokeVnet":{
+        "existingSpokeVnet":{
             "type": "string",
             "defaultValue": "",
             "allowedValues": [
@@ -56,28 +56,28 @@
                 "No"
             ],
             "metadata": {
-                "description": "If you choose the Option for ExistingSpokeVnet as Yes make sure to choose the existing Resource group where the existing vnet was akready created."
+                "description": "If you choose the Option for existingSpokeVnet as Yes make sure to choose the existing Resource group where the existing vnet was akready created."
             }
         },
         "existingVnetName":{
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVnet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
+                "description":"If you choose existingSpokeVnet as YES, then provide the name of the existing VNet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetName":{
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVnet as YES, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
+                "description":"If you choose existingSpokeVnet as YES, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetPrefix":{
             "type": "string",
             "defaultValue": "NA",
             "metadata": {
-                "description":"If you choose ExistingspokeVnet as YES, then provide the Address prefix of the existing subnet.Otherwise keep the default value as it is"
+                "description":"If you choose existingSpokeVnet as YES, then provide the Address prefix of the existing subnet.Otherwise keep the default value as it is"
             }
         },
         "fabricConnectorWorkloadAddressName":{
@@ -222,7 +222,7 @@
             "routeTableName":"[concat('WorkloadRoute',variables('suffix'))]",
             "tenantID":"[subscription().tenantId]",
             "clientID":"[parameters('clientID')]",
-            "ClientSecret":"[parameters('ClientSecret')]",
+            "ClientSecret":"[parameters('clientSecret')]",
             "subscriptionID":"[subscription().subscriptionId]",
             "rgName":"[variables('rgName')]",
             "fileUri":"[concat(variables('baseUrl'),'scripts/fg-automate.sh')]",
@@ -294,7 +294,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "vnetPeeringExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -324,7 +324,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "vnetPeeringNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -354,7 +354,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "FortiGateVMExisting",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
             "dependsOn": [
                 "vnetpeeringExisting"
             ],
@@ -381,7 +381,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "FortiGateVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
                 "vnetpeeringNew"
             ],
@@ -408,7 +408,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "workloadVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
                 "vnetpeeringNew"
             ],
@@ -438,7 +438,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "EndUserVMNew",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
                 "workloadVMNew"
             ],
@@ -474,7 +474,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "functionAppExistingroute",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
             "dependsOn": [
                 "vnetpeeringExisting"
             ],
@@ -507,7 +507,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "functionAppNewroute",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
                 "workloadVMNew"
             ],
@@ -534,7 +534,7 @@
             "type": "Microsoft.Resources/deployments",
             "name": "functionAppworkload",
             "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
                 "functionAppNewroute"
             ],
@@ -560,12 +560,12 @@
     ],
     "outputs": {
         "FortiGateWebURL": { 
-            "condition": "[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
             "type": "string",
             "value": "[concat('https://',reference('FortiGateVMExisting').outputs.fortigateFQDN.value)]"
         },
         "FortiGateWebURL1": {
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[concat('https://',reference('FortiGateVMNew').outputs.fortigateFQDN.value)]"
         },
@@ -586,7 +586,7 @@
             "value": "[parameters('adminPassword')]"
         },
         "EndUserVMPublicDNS1":{
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('EndUserVMNew').outputs.enduserFQDN.value]"
         },
@@ -599,27 +599,27 @@
             "value": "[variables('fortigateFirewallSettings').FGPubFacingAddress]"
         },
         "WorkloadVMPrivateIPAddress1":{
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress1.value]"
         },
         "WorkloadVMPrivateIPAddress2":{
-            "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress2.value]"
         },
          "DemoVnetAssociateRouteUrl":{
-             "condition":"[equals(parameters('ExistingspokeVnet'),'No')]",
+             "condition":"[equals(parameters('existingSpokeVnet'),'No')]",
              "type": "string",
              "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
          },
          "DemoVnetCleanupUrl":{
-            "condition":"[equals(parameters('ExistingspokeVnet'),'No')]",
+            "condition":"[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[concat('https://',variables('AzureFunction').functionAppName1,'.azurewebsites.net/api/WorkloadHttpTrigger?name=demo')]"
         },
         "ExistingVnetAssociateRouteUrl":{
-            "condition":"[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "condition":"[equals(parameters('existingSpokeVnet'),'Yes')]",
             "type": "string",
             "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
         }
