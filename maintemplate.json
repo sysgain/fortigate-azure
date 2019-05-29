@@ -16,6 +16,34 @@
                 "description": "password for FortiGate virtual machine,make a note of the password this will be used further."
             }
         },
+        "clientID":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description":"provide application ID of the service principal,which is used to automate the Azure Fabric Connector creation"
+            }
+        },
+        "clientSecret":{
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description":"provide password of the service principal,which is used to automate the Azure Fabric Connector creation"
+            }
+        },
+        "fabricConnectorWorkloadAddressName":{
+            "type": "string",
+            "defaultValue": "testip",
+            "metadata": {
+                "description":"provide the name of the fabric connector address"
+            }
+        },
+        "fabricConnectorFirewallAddressName":{
+            "type": "string",
+            "defaultValue": "firewallip",
+            "metadata": {
+                "description":"provide the name of the FortiGate fabric connector firewall address"
+            }
+        },
         "fortiGateVMSize": {
             "type": "string",
             "defaultValue": "Standard_F1",
@@ -32,20 +60,6 @@
             ],
             "metadata": {
                 "description": "FortiGate virtual machine size(if you select any size other than the default size the cost will be more)"
-            }
-        },
-        "clientID":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description":"provide application ID of the service principal,which is used to automate the Azure Fabric Connector creation"
-            }
-        },
-        "clientSecret":{
-            "type": "securestring",
-            "defaultValue": "",
-            "metadata": {
-                "description":"provide password of the service principal,which is used to automate the Azure Fabric Connector creation"
             }
         },
         "existingSpokeVnet":{
@@ -78,20 +92,6 @@
             "defaultValue": "NA",
             "metadata": {
                 "description":"if you choose existingSpokeVnet as Yes, then provide the address prefix of the existing subnet.Otherwise keep the default value as it is"
-            }
-        },
-        "fabricConnectorWorkloadAddressName":{
-            "type": "string",
-            "defaultValue": "testip",
-            "metadata": {
-                "description":"provide the name of the fabric connector address"
-            }
-        },
-        "fabricConnectorFirewallAddressName":{
-            "type": "string",
-            "defaultValue": "firewallip",
-            "metadata": {
-                "description":"provide the name of the FortiGate firewall address"
             }
         },
         "hubFotigateVnetCIDR":{
