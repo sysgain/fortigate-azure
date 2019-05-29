@@ -274,7 +274,7 @@
             "functionWorkerRuntime":"python",
             "webSiteNodeDefaultVersion":"10.14.1",
             "functionExtensionVersion":"~2",
-            "linuxFxVersion":"DOCKER|vivek225/routeupdatehttptrigger:v1.0.0",
+            "linuxFxVersion":"DOCKER|vivek225/routeupdatehttptrigger:v2.0.0",
             "linuxFxVersion1":"DOCKER|vivek225/workloadhttptrigger:v1.0.0",
             "appServiceStroage":"false",
             "dockerRegistryURL":"registry.hub.docker.com",
