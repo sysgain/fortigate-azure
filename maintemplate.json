@@ -38,14 +38,14 @@
             "type": "string",
             "defaultValue": "",
             "metadata": {
-                "description":"provide application ID of the service principal.which is used to automate the Azure Fabric Connector creation"
+                "description":"provide application ID of the service principal,which is used to automate the Azure Fabric Connector creation"
             }
         },
         "clientSecret":{
             "type": "securestring",
             "defaultValue": "",
             "metadata": {
-                "description":"provide password of the service principal.Which is used to automate the Azure Fabric Connector creation"
+                "description":"provide password of the service principal,which is used to automate the Azure Fabric Connector creation"
             }
         },
         "existingSpokeVnet":{
