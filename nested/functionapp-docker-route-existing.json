@@ -114,7 +114,7 @@
                       "value":"[parameters('existingVnetName')]"
                    },
                    {  
-                      "name":"subnetName1",
+                      "name":"Subnet1",
                       "value":"[parameters('existingSubnetName')]"
                    },
                    {  
