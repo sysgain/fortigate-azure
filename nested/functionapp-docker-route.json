@@ -108,11 +108,11 @@
                       "value":"[parameters('wlNetworkSettings').virtualNetworkName]"
                    },
                    {  
-                      "name":"subnetName1",
+                      "name":"Subnet1",
                       "value":"[parameters('wlNetworkSettings').subnetName1]"
                    },
                    {  
-                      "name":"subnetName2",
+                      "name":"Subnet2",
                       "value":"[parameters('wlNetworkSettings').subnetName2]"
                    },
                    {  
