@@ -252,7 +252,7 @@
         }, 
         "AzureFunction":{  
             "appServicePlanName":"[concat('appsvc',variables('suffix'))]",
-            "functionAppName":"[concat('functionroute',variables('suffix'))]",
+            "functionAppName":"[concat('functionassociate',variables('suffix'))]",
             "functionAppName1":"[concat('functionworkload',variables('suffix'))]",
             "storageName":"[concat('storageacc',variables('suffix'))]",
             "appInsightsName":"[concat('fg-appinsights',variables('suffix'))]",
@@ -607,6 +607,22 @@
             "condition": "[equals(parameters('ExistingspokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress2.value]"
-        }   
+        },
+         "DemoVnetAssociateRouteUrl":{
+             "condition":"[equals(parameters('ExistingspokeVnet'),'No')]",
+             "type": "string",
+             "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
+         },
+         "DemoVnetCleanupUrl":{
+            "condition":"[equals(parameters('ExistingspokeVnet'),'No')]",
+            "type": "string",
+            "value": "[concat('https://',variables('AzureFunction').functionAppName1,'.azurewebsites.net/api/WorkloadHttpTrigger?name=demo')]"
+        },
+        "ExistingVnetAssociateRouteUrl":{
+            "condition":"[equals(parameters('ExistingspokeVnet'),'Yes')]",
+            "type": "string",
+            "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
+        }
+
     }
 }
