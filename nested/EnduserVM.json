@@ -4,7 +4,10 @@
     "parameters": {
         "EndUserVMSettings": {
             "type": "object"
-        }    
+        },
+        "demoVnetAssociateRouteUrl":{
+            "type": "string"
+        }
     },
     "variables": {
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('EndUserVMSettings').vnetName)]",
@@ -187,6 +190,27 @@
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('EndUserVMSettings').nicName)]"
                         }
                     ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('EndUserVMSettings').VmName,'/Extensions')]",
+            "location": "[parameters('EndUserVMSettings').location]",
+            "apiVersion": "2017-03-30",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/',parameters('EndUserVMSettings').VmName)]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "[parameters('EndUserVMSettings').fileUri]"
+                    ],
+                    "commandToExecute": "[concat('sh fg-routeenable.sh',' ',parameters('demoVnetAssociateRouteUrl'))]"
                 }
             }
         }    
