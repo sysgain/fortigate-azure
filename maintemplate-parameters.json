@@ -2,39 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "adminUsername": {
-            "value": "adminuser"
-        },
-        "adminPassword": {
-            "value": "Password@1234"
-        },
-        "fortigateVMSize": { 
-            "value": "Standard_F1"           
-        },
-        "clientID":{            
-            "value": "4567-xxxx-1234-xxxx-xxxx-7689"
-        },
-        "ClientSecret":{
-            "value": "Xjygdysbcxxxxxxxxxxxxxxxxyudtsch"            
-        },
-        "ExistingspokeVnet":{            
-            "value": "No"
-        },
-        "existingVnetName":{
-            "value": "NA"
-        },
-        "existingSubnetName":{
-            "value": "NA"
-        },
-        "existingSubnetPrefix":{
-            "value": "NA"
-        },
-        "fabricConnectorWorkloadAddressName":{ 
-            "value": "testip"            
-        },
-        "fabricConnectorFirewallAddressName":{
-            "value": "firewallip"            
-        },
         "hubFotigateVnetCIDR":{            
             "value": "10.0.0.0/16"           
         },
@@ -50,6 +17,39 @@
         "FortiGateInsideSubnetAddress":{
             "value": "10.0.1.4"            
         },
+        "fortigateVMSize": { 
+            "value": "Standard_F1"           
+        },
+        "adminUserName": {
+            "value": "adminuser"
+        },
+        "adminPassword": {
+            "value": "Password@1234"
+        },
+        "clientID":{            
+            "value": "4567-xxxx-1234-xxxx-xxxx-7689"
+        },
+        "clientSecret":{
+            "value": "Xjygdysbcxxxxxxxxxxxxxxxxyudtsch"            
+        },
+        "fabricConnectorWorkloadAddressName":{ 
+            "value": "testip"            
+        },
+        "fabricConnectorFirewallAddressName":{
+            "value": "firewallip"            
+        },
+        "existingSpokeVnet":{            
+            "value": "No"
+        },
+        "existingVnetName":{
+            "value": "NA"
+        },
+        "existingSubnetName":{
+            "value": "NA"
+        },
+        "existingSubnetPrefix":{
+            "value": "NA"
+        }, 
         "spokeDemoVnetCIDR":{            
             "value": "172.1.0.0/16"
         },
