@@ -2,6 +2,59 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "hubFotigateVnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description":"provide the CIDR for FortiGate VNet(Hub VNet)"
+            }
+        },
+        "fortiGatePublicFacingSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description":"provide the CIDR for FortiGate public facing subnet"
+            }
+        },
+        "fortiGateInsideSubnetCIDR":{
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description":"provide the CIDR for FortiGate internal/private facing subnet"
+            }
+        },
+        "fortiGatePublicFacingSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.0.4",
+            "metadata": {
+                "description":"provide the static address of public facing subnet"
+            }
+        },
+        "fortiGateInsideSubnetAddress":{
+            "type": "string",
+            "defaultValue": "10.0.1.4",
+            "metadata": {
+                "description":"provide the statis address of internal/private facing subnet"
+            }
+        },
+        "fortiGateVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_F1",
+            "allowedValues": [
+                "Standard_F1",
+                "Standard_F16s",
+                "Standard_F1s",
+                "Standard_F2",
+                "Standard_F2s",
+                "Standard_F4",
+                "Standard_F4s",
+                "Standard_F8",
+                "Standard_F8s"
+            ],
+            "metadata": {
+                "description": "FortiGate virtual machine size(if you select any size other than the default size the cost will be more)"
+            }
+        },
         "adminUserName": {
             "type": "string",
             "defaultValue": "",
@@ -44,24 +97,6 @@
                 "description":"provide the name of the FortiGate fabric connector firewall address"
             }
         },
-        "fortiGateVMSize": {
-            "type": "string",
-            "defaultValue": "Standard_F1",
-            "allowedValues": [
-                "Standard_F1",
-                "Standard_F16s",
-                "Standard_F1s",
-                "Standard_F2",
-                "Standard_F2s",
-                "Standard_F4",
-                "Standard_F4s",
-                "Standard_F8",
-                "Standard_F8s"
-            ],
-            "metadata": {
-                "description": "FortiGate virtual machine size(if you select any size other than the default size the cost will be more)"
-            }
-        },
         "existingSpokeVnet":{
             "type": "string",
             "defaultValue": "",
@@ -93,42 +128,7 @@
             "metadata": {
                 "description":"if you choose existingSpokeVnet as Yes, then provide the address prefix of the existing subnet.Otherwise keep the default value as it is"
             }
-        },
-        "hubFotigateVnetCIDR":{
-            "type": "string",
-            "defaultValue": "10.0.0.0/16",
-            "metadata": {
-                "description":"provide the CIDR for FortiGate VNet(Hub VNet)"
-            }
-        },
-        "fortiGatePublicFacingSubnetCIDR":{
-            "type": "string",
-            "defaultValue": "10.0.0.0/24",
-            "metadata": {
-                "description":"provide the CIDR for FortiGate public facing subnet"
-            }
-        },
-        "fortiGateInsideSubnetCIDR":{
-            "type": "string",
-            "defaultValue": "10.0.1.0/24",
-            "metadata": {
-                "description":"provide the CIDR for FortiGate internal/private facing subnet"
-            }
-        },
-        "fortiGatePublicFacingSubnetAddress":{
-            "type": "string",
-            "defaultValue": "10.0.0.4",
-            "metadata": {
-                "description":"provide the static address of public facing subnet"
-            }
-        },
-        "fortiGateInsideSubnetAddress":{
-            "type": "string",
-            "defaultValue": "10.0.1.4",
-            "metadata": {
-                "description":"provide the statis address of internal/private facing subnet"
-            }
-        },
+        },  
         "spokeDemoVnetCIDR":{
             "type": "string",
             "defaultValue": "172.1.0.0/16",
@@ -149,6 +149,17 @@
             "metadata": {
                 "description":"provide the CIDR for demo subnet2(spoke2)"
             }
+        },
+        "demoVmsUserName":{
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "username for demo virtual machines, make a note of the username this will be used further"
+            }
+        },
+        "demoVmsPassword":{
+            "type": "securestring",
+            "defaultValue": "[concat('Demo@1',substring(uniqueString(resourceGroup().id), 0, 5))]"
         }
     },
     "variables": {
@@ -207,8 +218,8 @@
             "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
             "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
             "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
-            "adminUsername": "[parameters('adminUserName')]",
-            "adminPassword": "[parameters('adminPassword')]",
+            "adminUsername": "[parameters('demoVmsUserName')]",
+            "adminPassword": "[parameters('demoVmsPassword')]",
             "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
             "nicName2": "[concat('wl-nic-2',variables('suffix'))]",
             "networkSecurityGroupName": "[concat('workload-nsg',variables('suffix'))]",
@@ -242,11 +253,12 @@
             "nicName": "[concat('enduser-nic',variables('suffix'))]",
             "VmName": "[concat('enduserVM',variables('suffix'))]",
             "vmSize": "Standard_DS1_v2",
-            "Username": "[parameters('adminUserName')]",
-            "Password": "[parameters('adminPassword')]",
+            "Username": "[parameters('demoVmsUserName')]",
+            "Password": "[parameters('demoVmsPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
-            "ubuntuOSVersion": "16.04-LTS"
+            "ubuntuOSVersion": "16.04-LTS",
+            "fileUri":"[concat(variables('baseUrl'),'scripts/fg-routeenable.sh')]"
         }, 
         "AzureFunction":{  
             "appServicePlanName":"[concat('appsvc',variables('suffix'))]",
@@ -434,24 +446,6 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "EndUserVMNew",
-            "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "EndUserVMSettings":{
-                        "value":"[variables('EndUserVMSettings')]"
-                    }   
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
             "name": "functionAppExistingroute",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
@@ -536,7 +530,31 @@
                     }
                 }
             }
-        }   
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "EndUserVMNew",
+            "apiVersion": "[variables('deploymentApiVersion')]",
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
+            "dependsOn": [
+                "functionAppNewroute"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('baseUrl'),'nested/EnduserVM.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "EndUserVMSettings":{
+                        "value":"[variables('EndUserVMSettings')]"
+                    },
+                    "demoVnetAssociateRouteUrl":{
+                        "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
+                    }
+                }
+            }
+        } 
     ],
     "outputs": {
         "FortiGateWebURL": { 
@@ -549,21 +567,21 @@
             "type": "string",
             "value": "[concat('https://',reference('FortiGateVMNew').outputs.fortigateFQDN.value)]"
         },
-        "webUIAdminUserName": {
+        "FortiGateVMUserName": {
             "type": "string",
             "value": "[parameters('adminUserName')]"
         },
-        "webUIAdminPassword": {
+        "FortiGateVMPassword": {
             "type": "string",
             "value": "[parameters('adminPassword')]"
         },
-        "VM'sUserName":{
+        "DemoVM'sUserName":{
             "type": "string",
-            "value": "[parameters('adminUserName')]"
+            "value": "[parameters('demoVmsUserName')]"
         },
-        "VM'sPassword":{
+        "DemoVM'sPassword":{
             "type": "string",
-            "value": "[parameters('adminPassword')]"
+            "value": "[concat('Demo@1',substring(uniqueString(resourceGroup().id), 0, 5))]"
         },
         "EndUserVMPublicDNS1":{
             "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
