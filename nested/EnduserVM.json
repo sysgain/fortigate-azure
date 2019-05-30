@@ -53,7 +53,8 @@
             "name": "[parameters('EndUserVMSettings').nicName]",
             "location": "[parameters('EndUserVMSettings').location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('EndUserVMSettings').pipName)]"
+                "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('EndUserVMSettings').pipName)]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('EndUserVMSettings').nsgName)]"
             ],
             "properties": {
                 "ipConfigurations": [
