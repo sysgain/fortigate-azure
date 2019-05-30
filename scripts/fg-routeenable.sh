@@ -1,3 +1,3 @@
 #! /bin/bash
-DemoVnetAssociateRouteUrl=$1
-curl "$DemoVnetAssociateRouteUrl"
+demoVnetAssociateRouteUrl=$1
+curl "$demoVnetAssociateRouteUrl"
