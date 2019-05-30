@@ -149,17 +149,6 @@
             "metadata": {
                 "description":"provide the CIDR for demo subnet2(spoke2)"
             }
-        },
-        "demoVmsUserName":{
-            "type": "string",
-            "defaultValue": "",
-            "metadata": {
-                "description": "username for demo virtual machines, make a note of the username this will be used further"
-            }
-        },
-        "demoVmsPassword":{
-            "type": "securestring",
-            "defaultValue": "[concat('Demo@1',substring(uniqueString(resourceGroup().id), 0, 5))]"
         }
     },
     "variables": {
@@ -218,8 +207,8 @@
             "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
             "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
             "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
-            "adminUsername": "[parameters('demoVmsUserName')]",
-            "adminPassword": "[parameters('demoVmsPassword')]",
+            "adminUsername": "[variables('demoVmsUserName')]",
+            "adminPassword": "[variables('demoVmsPassword')]",
             "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
             "nicName2": "[concat('wl-nic-2',variables('suffix'))]",
             "networkSecurityGroupName": "[concat('workload-nsg',variables('suffix'))]",
@@ -253,8 +242,8 @@
             "nicName": "[concat('enduser-nic',variables('suffix'))]",
             "VmName": "[concat('enduserVM',variables('suffix'))]",
             "vmSize": "Standard_DS1_v2",
-            "Username": "[parameters('demoVmsUserName')]",
-            "Password": "[parameters('demoVmsPassword')]",
+            "Username": "[variables('demoVmsUserName')]",
+            "Password": "[variables('demoVmsPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
             "ubuntuOSVersion": "16.04-LTS",
@@ -297,6 +286,8 @@
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
         "rgName":"[resourceGroup().name]",
+        "demoVmsUserName":"demouser",
+        "demoVmsPassword":"[concat('Demo@1',variables('suffix'))]",
         "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
     "resources": [
@@ -577,11 +568,11 @@
         },
         "DemoVM'sUserName":{
             "type": "string",
-            "value": "[parameters('demoVmsUserName')]"
+            "value": "[variables('demoVmsUserName')]"
         },
         "DemoVM'sPassword":{
             "type": "string",
-            "value": "[concat('Demo@1',substring(uniqueString(resourceGroup().id), 0, 5))]"
+            "value": "[variables('demoVmsPassword')]"
         },
         "EndUserVMPublicDNS1":{
             "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
