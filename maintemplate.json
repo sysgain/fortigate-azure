@@ -278,9 +278,7 @@
             "linuxFxVersion":"DOCKER|vivek225/routeupdatehttptrigger:v2.0.0",
             "linuxFxVersion1":"DOCKER|vivek225/workloadhttptrigger:v5.0.0",
             "appServiceStroage":"false",
-            "dockerRegistryURL":"registry.hub.docker.com",
-            "dockerRegistryUser":"vivek225",
-            "dockerRegistryPassword":"v!vek@225"
+            "dockerRegistryURL":"registry.hub.docker.com"
          },        
         "location": "[resourceGroup().location]",
         "deploymentApiVersion": "2016-02-01",
