@@ -110,21 +110,21 @@
         },
         "existingVnetName":{
             "type": "string",
-            "defaultValue": "NA",
+            "defaultValue": "",
             "metadata": {
                 "description":"if you choose existingSpokeVnet as Yes, then provide the name of the existing VNet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetName":{
             "type": "string",
-            "defaultValue": "NA",
+            "defaultValue": "",
             "metadata": {
                 "description":"if you choose existingSpokeVnet as Yes, then provide the name of the eisting Subnet.Otherwise keep the default value as it is"
             }
         },
         "existingSubnetPrefix":{
             "type": "string",
-            "defaultValue": "NA",
+            "defaultValue": "",
             "metadata": {
                 "description":"if you choose existingSpokeVnet as Yes, then provide the address prefix of the existing subnet.Otherwise keep the default value as it is"
             }
