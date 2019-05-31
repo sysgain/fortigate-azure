@@ -45,14 +45,6 @@
                       "value":"[parameters('AzureFunction').dockerRegistryURL]"
                    },
                    {  
-                      "name":"DOCKER_REGISTRY_SERVER_USERNAME",
-                      "value":"[parameters('AzureFunction').dockerRegistryUser]"
-                   },
-                   {  
-                      "name":"DOCKER_REGISTRY_SERVER_PASSWORD",
-                      "value":"[parameters('AzureFunction').dockerRegistryPassword]"
-                   },
-                   {  
                       "name":"WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                       "value":"[parameters('AzureFunction').appServiceStroage]"
                    },
