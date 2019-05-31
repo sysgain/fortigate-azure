@@ -435,39 +435,6 @@
         },
         {
             "type": "Microsoft.Resources/deployments",
-            "name": "functionAppExistingroute",
-            "apiVersion": "[variables('deploymentApiVersion')]",
-            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
-            "dependsOn": [
-                "vnetpeeringExisting"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('baseUrl'),'nested/functionapp-docker-route-existing.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "AzureFunction":{
-                        "value":"[variables('AzureFunction')]"
-                    },
-                    "workloadsSettings": {
-                        "value": "[variables('workloadsSettings')]"
-                    },
-                    "existingVnetName":{
-                        "value":"[parameters('existingVnetName')]"
-                    },
-                    "existingSubnetName":{
-                        "value":"[parameters('existingSubnetName')]"
-                    },
-                    "existingSubnetPrefix":{
-                        "value": "[parameters('existingSubnetPrefix')]"
-                    }  
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
             "name": "functionAppNewroute",
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
@@ -556,6 +523,16 @@
             "type": "string",
             "value": "[concat('https://',reference('FortiGateVMNew').outputs.fortigateFQDN.value)]"
         },
+        "FortiGateDns": { 
+            "condition": "[equals(parameters('existingSpokeVnet'),'Yes')]",
+            "type": "string",
+            "value": "[reference('FortiGateVMExisting').outputs.fortigateFQDN.value]"
+        },
+        "FortiGate-Dns": { 
+            "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
+            "type": "string",
+            "value": "[reference('FortiGateVMNew').outputs.fortigateFQDN.value]"
+        },
         "FortiGateVMUserName": {
             "type": "string",
             "value": "[parameters('adminUserName')]"
@@ -604,12 +581,6 @@
             "condition":"[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[concat('https://',variables('AzureFunction').functionAppName1,'.azurewebsites.net/api/WorkloadHttpTrigger?name=demo')]"
-        },
-        "ExistingVnetAssociateRouteUrl":{
-            "condition":"[equals(parameters('existingSpokeVnet'),'Yes')]",
-            "type": "string",
-            "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
         }
-
     }
 }
