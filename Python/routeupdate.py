@@ -1,22 +1,28 @@
-#import logging
+import logging
 
-#import azure.functions as func
+import azure.functions as func
 
 import sys
+
+import os
 
 import json
 
 import requests
 
-AppID="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-AppPassword="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-TenantID="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-SubscriptionID="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-RGName="PM-test-rg-06"
-VNet="workLoadsVNETmzmxe"
-Subnet=["wlSubnet1mzmxe", "wlSubnet2mzmxe"]
-SubnetaddressPrefix=["172.1.0.0/24", "172.1.1.0/24"]
-RouteName="WorkloadRoutemzmxe"
+import time
+
+AppID=os.environ['AppID']
+AppPassword=os.environ['AppPassword']
+TenantID=os.environ['TenantID']
+SubscriptionID=os.environ['SubscriptionID']
+RGName=os.environ['RGName']
+VNet=os.environ['VNet']
+Subnet1=os.environ['Subnet1']
+Subnet2=os.environ['Subnet2']
+Subnet1addressPrefix=os.environ['Subnet1addressPrefix']
+Subnet2addressPrefix=os.environ['Subnet2addressPrefix']
+RouteName=os.environ['RouteName']
 
 
 #------------------------------------------------------------
@@ -46,11 +52,32 @@ def SubnetAssociation():
     params = (
         ('api-version', '2018-11-01'),
     )
-    data1 = {'properties':{'addressPrefix':SubnetaddressPrefix[0],'routeTable':{'id':'/subscriptions/'+SubscriptionID+'/resourceGroups/'+RGName+'/providers/Microsoft.Network/routeTables/'+RouteName}}}
-    data2 = {'properties':{'addressPrefix':SubnetaddressPrefix[1],'routeTable':{'id':'/subscriptions/'+SubscriptionID+'/resourceGroups/'+RGName+'/providers/Microsoft.Network/routeTables/'+RouteName}}}
-    response1 = requests.put('https://management.azure.com/subscriptions/' + SubscriptionID +'/resourceGroups/' + RGName +'/providers/Microsoft.Network/virtualNetworks/' + VNet + '/subnets/' + Subnet[0] + '?api-version=2018-11-01', headers=headers, data=json.dumps(data1))
-    response2 = requests.put('https://management.azure.com/subscriptions/' + SubscriptionID +'/resourceGroups/' + RGName +'/providers/Microsoft.Network/virtualNetworks/' + VNet + '/subnets/' + Subnet[1] + '?api-version=2018-11-01', headers=headers, data=json.dumps(data2))
+    data1 = {'properties':{'addressPrefix':Subnet1addressPrefix,'routeTable':{'id':'/subscriptions/'+SubscriptionID+'/resourceGroups/'+RGName+'/providers/Microsoft.Network/routeTables/'+RouteName}}}
+    data2 = {'properties':{'addressPrefix':Subnet2addressPrefix,'routeTable':{'id':'/subscriptions/'+SubscriptionID+'/resourceGroups/'+RGName+'/providers/Microsoft.Network/routeTables/'+RouteName}}}
+    response1 = requests.put('https://management.azure.com/subscriptions/' + SubscriptionID +'/resourceGroups/' + RGName +'/providers/Microsoft.Network/virtualNetworks/' + VNet + '/subnets/' + Subnet1 + '?api-version=2018-11-01', headers=headers, data=json.dumps(data1))
+    time.sleep(5)
+    response2 = requests.put('https://management.azure.com/subscriptions/' + SubscriptionID +'/resourceGroups/' + RGName +'/providers/Microsoft.Network/virtualNetworks/' + VNet + '/subnets/' + Subnet2 + '?api-version=2018-11-01', headers=headers, data=json.dumps(data2))
     print (response1.content)
     print (response2.content)
     return
-SubnetAssociation()
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    name = req.params.get('name')
+    if not name:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            name = req_body.get('name')
+
+    if name == 'update':
+        SubnetAssociation()
+        return func.HttpResponse(f"Subnet association updated")
+    else:
+        return func.HttpResponse(
+             "Please pass a name on the query string as <name=update> or in the request body",
+             status_code=400
+        )
