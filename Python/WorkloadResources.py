@@ -1,6 +1,8 @@
-#import logging
+import logging
 
-#import azure.functions as func
+import azure.functions as func
+
+import os
 
 import sys
 
@@ -10,21 +12,21 @@ import requests
 
 import time
 
-AppID="XXXXXXXXXXXX"
-AppPassword="XXXXXXXXXX"
-TenantID="XXXXXXXXXXXXXXXXXXXXX"
-SubscriptionID="XXXXXXXXXXXXXXXXXXXXXX"
-RGName="FG-Test-RG-1006"
-VmName1="workloadVM-16imww"
-VmName2="workloadVM-26imww"
-Nic1="wl-nic-16imww"
-Nic2="wl-nic-26imww"
-Disk1="workloadVM-16imww_disk1_7cea26bc16f545e6ae2a91f911fa751a"
-Disk2="workloadVM-26imww_disk1_5e3215a6e3f44c41bf810e86c676fb31"
-NSG="workload-nsg6imww"
-RouteTable="WorkloadRoute6imww"
-Route="to-InternetDefaultRoute"
-VNet="workLoadsVNET6imww"
+AppID=os.environ['AppID']
+AppPassword=os.environ['AppPassword']
+TenantID=os.environ['TenantID']
+SubscriptionID=os.environ['SubscriptionID']
+RGName=os.environ['RGName']
+VmName1=os.environ['VmName1']
+VmName2=os.environ['VmName2']
+Nic1=os.environ['Nic1']
+Nic2=os.environ['Nic2']
+Disk1=os.environ['Disk1']
+Disk2=os.environ['Disk2']
+NSG=os.environ['NSG']
+RouteTable=os.environ['RouteTable']
+Route=os.environ['Route']
+VNet=os.environ['VNet']
 #------------------------------------------------------------
 #Get Azure Token ID
 #------------------------------------------------------------
@@ -197,10 +199,30 @@ def WorkLoadVNetDelete():
     else:
             print ('VNet '+ VNet +' Deleted or does not exists or exception')
     return
-WorkLoadVMDelete()
-WorkLoadNICDelete()
-WorkLoadDiskDelete()
-WorkLoadNSGDelete()
-WorkLoadRouteDelete()
-WorkLoadRouteTableDelete()
-WorkLoadVNetDelete()
+
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    name = req.params.get('name')
+    if not name:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            name = req_body.get('name')
+
+    if name == 'demo':
+        WorkLoadVMDelete()
+        WorkLoadNICDelete()
+        WorkLoadDiskDelete()
+        WorkLoadNSGDelete()
+        WorkLoadRouteDelete()
+        WorkLoadRouteTableDelete()
+        WorkLoadVNetDelete()
+        return func.HttpResponse(f"The Demo resources deletion trigger, please check the log file & Resources in Azure Portal")
+    else:
+        return func.HttpResponse(
+             "Please pass a <name=demo> on the query string or in the request body",
+             status_code=400
+        )
