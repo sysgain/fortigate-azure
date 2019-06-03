@@ -207,8 +207,8 @@
             "virtualMachineName1": "[concat('workloadVM-1',variables('suffix'))]",
             "virtualMachineName2": "[concat('workloadVM-2',variables('suffix'))]",
             "publicIPdnsPrefix": "[concat('workloadpip',variables('suffix'))]",
-            "adminUsername": "[variables('demoVmsUserName')]",
-            "adminPassword": "[variables('demoVmsPassword')]",
+            "adminUsername": "[variables('demoVmUserName')]",
+            "adminPassword": "[variables('demoVmPassword')]",
             "nicName1": "[concat('wl-nic-1',variables('suffix'))]",
             "nicName2": "[concat('wl-nic-2',variables('suffix'))]",
             "networkSecurityGroupName": "[concat('workload-nsg',variables('suffix'))]",
@@ -242,8 +242,8 @@
             "nicName": "[concat('enduser-nic',variables('suffix'))]",
             "VmName": "[concat('enduserVM',variables('suffix'))]",
             "vmSize": "Standard_DS1_v2",
-            "Username": "[variables('demoVmsUserName')]",
-            "Password": "[variables('demoVmsPassword')]",
+            "Username": "[variables('enduserVmUserName')]",
+            "Password": "[variables('enduserVmPassword')]",
             "imagePublisher": "Canonical",
             "imageOffer": "UbuntuServer",
             "ubuntuOSVersion": "16.04-LTS",
@@ -284,8 +284,10 @@
         "deploymentApiVersion": "2016-02-01",
         "suffix": "[substring(uniqueString(resourceGroup().id), 0, 5)]",
         "rgName":"[resourceGroup().name]",
-        "demoVmsUserName":"demouser",
-        "demoVmsPassword":"[concat('Demo@1',variables('suffix'))]",
+        "demoVmUserName":"demouser",
+        "enduserVmUserName":"enduser",
+        "demoVmPassword":"[concat('Demo@1',variables('suffix'))]",
+        "enduserVmPassword":"[concat('Endu@1',variables('suffix'))]",
         "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
     "resources": [
@@ -428,7 +430,7 @@
                         "value": "[variables('apiVersions')]"
                     },
                     "adminUsername":{
-                        "value": "[variables('demoVmsUserName')]"
+                        "value": "[variables('demoVmUserName')]"
                     }
                 }
             }
@@ -541,18 +543,26 @@
             "type": "string",
             "value": "[parameters('adminPassword')]"
         },
-        "DemoVM'sUserName":{
+        "WorkloadVM-UserName":{
             "type": "string",
-            "value": "[variables('demoVmsUserName')]"
+            "value": "[variables('demoVmUserName')]"
         },
-        "DemoVM'sPassword":{
+        "WorkloadVM-Password":{
             "type": "string",
-            "value": "[variables('demoVmsPassword')]"
+            "value": "[variables('demoVmPassword')]"
         },
         "EndUserVMPublicDNS":{
             "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
             "value": "[reference('EndUserVMNew').outputs.enduserFQDN.value]"
+        },
+        "EndUserVM-UserName":{
+            "type": "string",
+            "value": "[variables('enduserVmUserName')]"
+        },
+        "EndUserVM-Password":{
+            "type": "string",
+            "value": "[variables('enduserVmPassword')]"
         },
         "resourceGroupName":{
             "type": "string",
