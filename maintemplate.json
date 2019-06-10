@@ -582,11 +582,6 @@
             "type": "string",
             "value": "[reference('workloadVMNew').outputs.WorkloadVMPrivateIPAddress2.value]"
         },
-         "DemoVnetAssociateRouteUrl":{
-             "condition":"[equals(parameters('existingSpokeVnet'),'No')]",
-             "type": "string",
-             "value": "[concat('https://',variables('AzureFunction').functionAppName,'.azurewebsites.net/api/routeupdateHttpTrigger?name=update')]"
-         },
          "DemoVnetCleanupUrl":{
             "condition":"[equals(parameters('existingSpokeVnet'),'No')]",
             "type": "string",
