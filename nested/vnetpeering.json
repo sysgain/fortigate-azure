@@ -20,8 +20,7 @@
     },
     "variables": {
         "routeTable1Id": "[resourceId('Microsoft.Network/routeTables',parameters('fortigateFirewallSettings').routeTable1Name)]",
-        "routeTable2Id": "[resourceId('Microsoft.Network/routeTables',parameters('fortigateFirewallSettings').routeTable2Name)]",
-        "routeTableWLID": "[resourceId('Microsoft.Network/routeTables',parameters('workloadsSettings').routeTableName)]"
+        "routeTable2Id": "[resourceId('Microsoft.Network/routeTables',parameters('fortigateFirewallSettings').routeTable2Name)]"
        },
     "resources": [
         {
@@ -173,16 +172,9 @@
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('wlNetworkSettings').subnetName1]",
+                        "name": "[parameters('wlNetworkSettings').subnetName]",
                         "properties": {
-                            "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix1]"
-                            
-                        }
-                    },
-                    {
-                        "name": "[parameters('wlNetworkSettings').subnetName2]",
-                        "properties": {
-                            "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix2]"
+                            "addressPrefix": "[parameters('wlNetworkSettings').subnetPrefix]"
                             
                         }
                     }
