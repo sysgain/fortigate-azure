@@ -287,8 +287,8 @@
         "rgName":"[resourceGroup().name]",
         "demoVmUserName":"demouser",
         "enduserVmUserName":"enduser",
-        "demoVmPassword":"[concat('Demo@1',variables('suffix'))]",
-        "enduserVmPassword":"[concat('Endu@1',variables('suffix'))]",
+        "demoVmPassword":"[concat('Demo@123',variables('suffix'))]",
+        "enduserVmPassword":"[concat('Endu@123',variables('suffix'))]",
         "staticRoute":"[concat(variables('wlNetworkSettings').staticRouteAddress[0],'/255.255.0.0')]",
         "baseUrl": "https://raw.githubusercontent.com/sysgain/fortigate-azure/master/"
     },
@@ -594,3 +594,4 @@
         }
     }
 }
+
