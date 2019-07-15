@@ -500,7 +500,7 @@
             "apiVersion": "[variables('deploymentApiVersion')]",
             "condition": "[equals(parameters('existingSpokeVnet'),'No')]",
             "dependsOn": [
-                "functionAppNewroute"
+                "functionAppworkload"
             ],
             "properties": {
                 "mode": "Incremental",
