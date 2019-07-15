@@ -41,7 +41,7 @@
             "type": "string",
             "defaultValue": "10.0.1.1",
             "metadata": {
-                "description":"Provide the Gateway address of the privtae subnet"
+                "description":"Provide the Gateway address of the FortiGate private subnet"
             }
         },
         "fortiGateVMSize": {
