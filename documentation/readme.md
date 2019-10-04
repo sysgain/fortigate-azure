@@ -162,13 +162,16 @@ Dynamic address objects (IP addresses) in Azure can be resolved by FortiGate Azu
 
 You can also run the following commands in the **Azure CLI** to assign roles to the App on the Subscription level:
 
-**Ex:** az role assignment create --assignee <App ID> --role <Role Name> --subscription <subscriptionname/ID>
+**Ex:** az role assignment create --assignee **App ID** --role **Role Name** --subscription <subscriptionname/ID>
 
 > az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Network Contributor" --subscription "demoSubcription"
 
 > az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Virtual Machine Contributor" --subscription "demoSubcription"
  
- 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/14.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+
 ### 3.2. Deploying the ARM Template
 
 1. Click on the Deploy to Azure button from this link. 
