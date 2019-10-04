@@ -178,20 +178,21 @@ You can also run the following commands in the **Azure CLI** to assign roles to 
 
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/16.png)
 
-2.	It will open a Microsoft Azure Sign In page. Enter your Azure portal credentials then a Custom deployment page appears. Fill in all the details, accept the terms and conditions and click on the Purchase button.
+2.	It will open a Microsoft Azure Sign In page. Enter your Azure portal credentials then a **Custom deployment** page appears. Fill in all the details, accept the terms and conditions and click on the **Purchase** button.
    
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/17.png)
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/1.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/18.png)
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/19.png)
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/20.png)
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/21.png)
  
-After clicking on the Purchase button, the deployment starts. It will take around 8-12 mins to deploy the template. 
-3.2.1.	 ARM Template Input Parameters
+After clicking on the **Purchase** button, the deployment starts. It will take around **8-12 mins** to deploy the template. 
+
+### 3.2.1.	ARM Template Input Parameters
 
 Parameter Name	Description	Allowed Values	Default Values
 hubFotigateVNetCIDR	CIDR address for FortiGate vnet (Hub vnet)		10.0.0.0/16
@@ -233,101 +234,168 @@ spokeDemoSubnetCIDR2
 	CIDR address for Demo subnet2(spoke)		172.1.1.0/24
 
 
-3.2.2.	 ARM Template Output Parameters
+#### 3.2.2.	ARM Template Output Parameters
 
-To view the output parameters of the deployed template, you need to navigate to Resource Group, then you need click on Deployments, then click on Microsoft.Template and after that you need to click on Outputs, as shown below:
+To view the output parameters of the deployed template, you need to navigate to **Resource Group**, then you need click on **Deployments**, then click on **Microsoft.Template** and after that you need to click on **Outputs**, as shown below:
 
-4.	Configuring FortiGate
-1.	After a successful deployment, login to the FortiGate UI using the fortigateWebURL provided in the Outputs of the deployments as discussed in 3.2.2. section 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/22.png)
+
+## 4. Configuring FortiGate
+
+1.	After a successful deployment, login to the FortiGate UI using the **fortigateWebURL** provided in the **Outputs** of the deployments as discussed in **3.2.2. section** 
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/23.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/24.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/25.png)
+
+2.	Provide the username and password to login into the FortiGate web Interface. You can get these values from **fortiGateVMUserName** and **fortiGateVMPassword** output parameters as discussed in **section 3.2.2**.
  
-
- 
-
- 
-2.	Provide the username and password to login into the FortiGate web Interface. You can get these values from fortiGateVMUserName and fortiGateVMPassword output parameters as discussed in section 3.2.2.
- 
-
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/26.png)
 
 3.	After login, you can see the dashboard as shown below:
  
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/27.png)
 
 The ARM template automates the creation of Fabric Connector for Microsoft Azure. If you use the fabric connector, the changes made to the Azure environment are automatically reflected to the fabric connector address objects without any manual changes. 
-The template also creates two Fabric Connector addresses with filter values tags.displayName=web and tags.displayName=firewall.
-To demonstrate how to use a dynamic address, the template creates virtual machines with tag names displayName with values “web” and “firewall”. The Address Objects contain IP address(es) within the Azure instance that are running.
+
+The template also creates two Fabric Connector addresses with filter values **tags.displayName=web** and **tags.displayName=firewall**.
+
+To demonstrate how to use a dynamic address, the template creates virtual machines with tag names **displayName** with values “**web**” and “**firewall**”. The Address Objects contain IP address(es) within the Azure instance that are running.
+
 When changes occur to addresses in the Azure environment, the Fabric Connector populates and updates the changes automatically based on the specified filtering condition. So, Administrators do not need to reconfigure the Address Objects content manually.
+
 The following screenshot shows the Fabric Connector for Microsoft Azure and the addresses.
-You can view the same by navigating to the path Security Fabric  Fabric Connectors 
+
+You can view the same by navigating to the path **Security Fabric** -> **Fabric Connectors**
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/28.png)
  
-For Fabric Connector Addresses Click on Policy & Objects  Addresses 
+For Fabric Connector Addresses Click on **Policy&Objects** -> **Addresses**
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/29.png)
  
-Note: It will take some time to resolve the fabric connector address. If it does not resolve within the time and you see any error, then double click on the address to change any of the values like Name or Color to a different value and click Ok. After a while, mouse-hover on the name of the fabric connector address you will be able to see resolved IP addresses as shown below:
+**Note:** It will take some time to resolve the fabric connector address. If it does not resolve within the time and you see any error, then double click on the address to change any of the values like Name or Color to a different value and click **Ok**. After a while, mouse-hover on the name of the fabric connector address you will be able to see resolved IP addresses as shown below:
  
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/30.png)
+
 In this document you will be presented with a use case which demonstrates how can you protect a workload using FortiGate and the use of fabric connector addresses.
+
 The ARM template automates the creation of required Virtual IPs and IPv4 policies required for the use case.
+
 You will need two Virtual IPs, one for SSH and one to access the sample web application from the workload VM. 
-Let us understand what Virtual IP (VIP) is – The mapping of a specific IP address to another specific IP address is usually referred to as Destination NAT. When the Central NAT table is not being used, FortiOS calls this a Virtual IP Address – sometimes referred to as a VIP.
+
+Let us understand what **Virtual IP**(VIP) is – The mapping of a specific IP address to another specific IP address is usually referred to as Destination NAT. When the Central NAT table is not being used, FortiOS calls this a Virtual IP Address – sometimes referred to as a **VIP**.
+
 The above mentioned two VIPs allow users on the Internet to connect to your server protected behind a FortiGate firewall, without knowing the server’s internal IP address and only through ports that you choose.
-TCP ports 8888 (HTTP) and 22 (SSH) are opened for remote users to communicate with a server behind the firewall. The external IP address used is 10.0.0.4 (FortiGate Public facing IP) and is mapped to 172.1.0.4 (workload IP/spoke VM IP) by the VIP. In the following screenshots you will be selecting the Interface as port 1 which is a public facing interface under the Network section, which allows users on the Internet to connect to your firewall (FortiGate).
-You can view the Virtual IPs which were created using the ARM template by navigating to Policy & Objects  Virtual IPs.
+
+TCP ports 8888 (HTTP) and 22 (SSH) are opened for remote users to communicate with a server behind the firewall. The external IP address used is 10.0.0.4 (FortiGate Public facing IP) and is mapped to 172.1.0.4 (workload IP/spoke VM IP) by the VIP. In the following screenshots you will be selecting the Interface as port 1 which is a public facing interface under the **Network** section, which allows users on the Internet to connect to your firewall (FortiGate).
+
+You can view the Virtual IPs which were created using the ARM template by navigating to **Policy&Objects** -> **Virtual IPs**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/31.png)
  
 You need to create the three policies. Let us understand what a policy is – The firewall policy is the axis around which most of the other features of the FortiGate firewall revolve. A large portion of the settings in the firewall at some point will end up relating to or being associated with the firewall policies and the traffic that they govern.
+
 One policy is for SSH connection into the workload VM, the second policy is for accessing the sample web application, and the third is for allowing internet inside the workload VM.
-You can see all the policies by navigating to Policy & Objects IPv4 Policy.
+
+You can see all the policies by navigating to **Policy&Objects** -> **IPv4 Policy**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/32.png)
  
-Note: Here you see a total of four policies: one for Fabric connector – i.e. An IPv4 policy from the FortiGate-VM ‘virtual appliance’ on Port 2 (Internal) to Port 1 (External) – the second one for SSH into the workload VM, the third one for accessing the sample web site and the fourth one is for Blocking the URL.
+**Note**: Here you see a total of four policies: one for Fabric connector – i.e. An IPv4 policy from the FortiGate-VM ‘virtual appliance’ on Port 2 (Internal) to Port 1 (External) – the second one for SSH into the workload VM, the third one for accessing the sample web site and the fourth one is for Blocking the URL.
 To view the sample web site, use the link as shown below and open the test website from a web browser on your local machine.
-http://<DNS of the FortiGate VM>:8888	
-Ex: http:// fortigateijkah.eastus2.cloudapp.azure.com:8888
+
+http://<DNS of the FortiGate VM>:8888
+
+**Ex:** http:// fortigateijkah.eastus2.cloudapp.azure.com:8888
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/33.png)
  
-5	Blocking a URL Using IPv4 Policy and Fabric Connector Address
-Open PuTTY from your local machine and SSH into the workload VM through the FortiGate VM DNS. You can get the required details from the Outputs of the template deployment. Refer to 3.2.2. section for viewing the output parameters of the template deployment.
-You can get the FortiGate VM DNS from the output parameter named “fortiGate-Dns” and the user name from the output parameter “workloadVM-UserName”. The password is from the output parameter “workloadVM-Password”. 
+## 5. Blocking a URL Using IPv4 Policy and Fabric Connector Address
+
+Open PuTTY from your local machine and SSH into the workload VM through the FortiGate VM DNS. You can get the required details from the Outputs of the template deployment. Refer to **3.2.2. section** for viewing the output parameters of the template deployment.
+
+You can get the FortiGate VM DNS from the output parameter named “**fortiGate-Dns**” and the user name from the output parameter “**workloadVM-UserName**”. The password is from the output parameter “**workloadVM-Password**”. 
+
 Note: You can download PuTTY here
-SSH instructions for Windows
-1.	Grab all the required values and SSH into the workload VM as shown below:
- 
 
-2.	Click on YES.
+**SSH instructions for Windows**
 
- 
+1.	Grab all the required values and **SSH** into the workload VM as shown below:
 
-3.	After connecting to the VM successfully, provide the username and password of the Workload VM. 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/34.png)
 
- 
+2.	Click on **YES**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/35.png)
+
+3.	After connecting to the VM successfully, provide the **username** and **password** of the Workload VM. 
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/36.png)
 
 4.	After a successful login you can view following screen:	
- 
 
-SSH instruction for Mac OS
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/37.png)
+
+**SSH instruction for Mac OS**
+
 5.	Launch the Terminal application, you can launch it from Spotlight by hitting Command + Spacebar and typing “Terminal”.
- 
-6.	In the command prompt, enter the following ssh command and hit Enter.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/38.png)
+
+6.	In the command prompt, enter the following **ssh** command and hit Enter.
+
+```
 Syntax:  ssh <username>@<DNS(OR)IP Address> -p <port number>
+
 ssh demouser@fortigatepw2x4.westus2.cloudapp.azure.com -p 2222
- 
+
+```
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/39.png)
+
 7.	Login to the remote server by entering the password for the user account you are logging into.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/40.png)
+
+**Note**: You can login to the workload VM using the FortiGate DNS with port 2222, as you have created a policy **(ssh-wl)**in the earlier steps to route the SSH traffic to the workload VM through the FortiGate VM.
+
+8.	Once you login to the workload VM, run the following command to access a specific URL. In this case it is **www.facebook.com**.
+         
+         **wget www.facebook.com**
+
+**Note**: After login to the workload VM the commands are same for the Window OS and Mac OS.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/40.png)
  
-Note: You can login to the workload VM using the FortiGate DNS with port 2222, as you have created a policy (ssh-wl) in the earlier steps to route the SSH traffic to the workload VM through the FortiGate VM.
-8.	Once you login to the workload VM, run the following command to access a specific URL. In this case it is www.facebook.com.
-         wget www.facebook.com 
-Note: After login to the workload VM the commands are same for the Window OS and Mac OS.
- 
-You can see that you are able to access facebook.com and download the index.html file (to verify, enter the “ls” command and you can see index.html file, as shown in above screenshot).
-You can control web content by blocking access to web pages containing specific words or patterns. This can be done by using the “Web content filter”. The web content filter feature scans the content of every web page that is accepted by a security policy.
-9.	Navigate to Security Profile  Web Filter, click on Create New 
- 
-10.	Provide the name of the Web Filter profile under Name as shown below
- 
-11.	Scroll down until you find Static URL Filter then enable URL Filter, click on Create. A New URL Filter pop-up will appear. Fill in the URL with *facebook.com. Select Type as Wildcard and Action as Block then click OK and then click Apply as shown below:
- 
+You can see that you are able to access facebook.com and download the index.html file (to verify, enter the “**ls**” command and you can see index.html file, as shown in above screenshot).
+
+You can control web content by blocking access to web pages containing specific words or patterns. This can be done by using the “**Web content filter**”. The web content filter feature scans the content of every web page that is accepted by a security policy.
+
+9.	Navigate to **Security Profile** -> **Web Filter**, click on **Create New**
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/41.png)
+
+10.	Provide the name of the Web Filter profile under **Name** as shown below
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/42.png)
+
+11.	Scroll down until you find **Static URL Filter** then enable **URL Filter**, click on **Create**. A New URL Filter pop-up will appear. Fill in the **URL** with ***facebook.com**. Select **Type** as Wildcard and **Action** as **Block** then click **OK** and then click **Apply** as shown below:
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/43.png)
+
 12.	You will need to update an IPv4 Policy (blocking-url-policy) to block the URL (facebook) in the workload VM. Click on Policy & Objects  IPv4 Policy then double click on blocking-url-policy enable Web Filter, select the Web Filter profile(blocking-url) you have created earlier and select Enable this policy as shown below:
- 
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/44.png)
+
 13.	Now, try to access the Facebook site from the workload VM again, as shown below. You will now not be able to access the Facebook web URL.
 NOTE: Move the ‘Block-Facebook’ policy to top of the list so that it will take the highest precedence if you have any similar policies. You can move the policy as shown below.
 Changing the policy precedence
 Click on the policy you want to move (ex: ‘Block-Facebook’). Hold the left mouse button and move it to the top of the policy list.
  
- 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/45.png)
  
 14.	You can view the log details in FortiGate UI by navigating to Log & Reports  Web Filter, then click on the log entry and click on Details for more information.
  
