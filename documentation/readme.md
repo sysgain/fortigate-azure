@@ -66,33 +66,42 @@ Fortinet FortiGate-VM firewall technology delivers complete content and network 
  
 ### 2.1 Network Flow Diagram
 
-You will get the same network flow if you deploy the template with default values. If you change any network related parameters, you will get a different network flow based on the given values.
-•	All the inbound traffic is from Port1 Port 2                      
-•	All the outbound traffic is from Port2  Port 1
-•	A static route from FortiGate to workload (172.1.0.0/16 10.0.1.1(Gateway))
-3.	Deploying the Demo Solution ARM Template
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/2.png)
 
-3.1 Pre-Deployment Step: Collecting the Details from Azure
+You will get the same network flow if you deploy the template with default values. If you change any network related parameters, you will get a different network flow based on the given values.
+
+*	All the inbound traffic is from Port1 to Port 2                      
+*	All the outbound traffic is from Port2 to Port 1
+*	A static route from FortiGate to workload (172.1.0.0/16 to 10.0.1.1(Gateway))
+
+## 3. Deploying the Demo Solution ARM Template
+
+### 3.1 Pre-Deployment Step: Collecting the Details from Azure
+
 Before you deploy the template, you need to have the following information:
-•	Azure Tenant ID
+
+- **Azure Tenant ID**
 A tenant is a representation of an organization. An Azure tenant ID is the Azure AD GUID associated with an Azure subscription.
 
-•	Azure Client ID (also called ‘Application ID’)
+- **Azure Client ID** (also called ‘Application ID’)
 The unique identifier Azure AD issues to an application registration that identifies a specific application and the associated configurations. This application id (client id) is used while performing authentication requests.
 
-•	Azure Client Secret
+- **Azure Client Secret**
 Password for API Access in Registered App settings.
 
-•	Azure Subscription ID
+- **Azure Subscription ID**
 The subscription ID is a unique alphanumeric string that identifies your Azure subscription. 
 
-3.1.1.	Create Service Principal for Azure AD Using Azure Portal (GUI)
+#### 3.1.1.	Create Service Principal for Azure AD Using Azure Portal (GUI)
 
 An Azure AD application must be created to generate the Azure client ID and the corresponding Azure client secret, or Key as it is referred to in Azure. This application must be a service principal. Otherwise, the Azure SDN connector cannot read the inventory.
 Note: Before creating the service principal, you need to verify that you have the required permissions on the subscription. Make sure your subscription has the following permissions:
-•	Application Administrator
-•	A User with app registrations setting is set to ‘Yes’
-In your Azure subscription, your account must have the Owner role or User Access Administrator role.
+
+*  Application Administrator
+*  A User with app registrations setting is set to ‘Yes’
+
+In your Azure subscription, your account must have the **Owner** role or **User Access Administrator** role.
+
 For more information on the required permissions refer this link. For more information on the available roles and permissions refer this link.
 1.	Sign in to your Azure account through the Azure portal and select Azure Active Directory > App registrations > New registration.
  
