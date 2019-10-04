@@ -66,13 +66,13 @@ Fortinet FortiGate-VM firewall technology delivers complete content and network 
  
 ### 2.1 Network Flow Diagram
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/2.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/2.jpg)
 
 You will get the same network flow if you deploy the template with default values. If you change any network related parameters, you will get a different network flow based on the given values.
 
-*	All the inbound traffic is from Port1 to Port 2                      
-*	All the outbound traffic is from Port2 to Port 1
-*	A static route from FortiGate to workload (172.1.0.0/16 to 10.0.1.1(Gateway))
+*	All the inbound traffic is from Port1 -> Port 2                      
+*	All the outbound traffic is from Port2 -> Port 1
+*	A static route from FortiGate to workload (172.1.0.0/16 ->10.0.1.1(Gateway))
 
 ## 3. Deploying the Demo Solution ARM Template
 
@@ -102,51 +102,74 @@ Note: Before creating the service principal, you need to verify that you have th
 
 In your Azure subscription, your account must have the **Owner** role or **User Access Administrator** role.
 
-For more information on the required permissions refer this link. For more information on the available roles and permissions refer this link.
-1.	Sign in to your Azure account through the Azure portal and select Azure Active Directory > App registrations > New registration.
+1.	Sign in to your Azure account through the Azure portal and select **Azure Active Directory > App registrations > New registration**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/3.png)
  
-2.	Provide a name and select the Supported account types. Add a Redirect URI for the application. Select Web for the type of application you want to create. After setting the values, click on Register.
+2.	Provide a name and select the **Supported account types**. Add a **Redirect URI** for the application. Select **Web** for the type of application you want to create. After setting the values, click on **Register**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/4.png)
  
 3.	Once you register the App, the following screen appears. You need to grab the Application/Client ID as shown below:
  
-4.	To create the password, you will need to click on the Certificates & secrets then click on + New client secret. Provide the needed description, select the expiry duration and click on Add.
- 
-5.	Once you click on Add, the client secret/password will be created and shown under the VALUE column as shown below. Copy the value and keep it for future use.
- 
-3.1.2.	Create Service Principal for Azure AD Using Azure Cloud Shell (CLI)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/5.png)
 
-1.	Run the command az ad sp create-for-rbac -n sdntest-ap --skip-assignment
+4.	To create the password, you will need to click on the **Certificates & secrets** then click on **+ New client secret**. Provide the needed description, select the expiry duration and click on **Add**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/6.png)
+ 
+5.	Once you click on **Add**, the client secret/password will be created and shown under the VALUE column as shown below. Copy the ***VALUE*** and keep it for future use.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/7.png)
+
+
+#### 3.1.2.	Create Service Principal for Azure AD Using Azure Cloud Shell (CLI)
+
+1.	Run the command **az ad sp create-for-rbac -n sdntest-ap --skip-assignment**
  to get the App ID (Azure Client ID), tenant Id and password (Azure client secret).
 
-Note: If you do not have the required permissions, contact your Azure portal admin to create a service principal with Network Contributor and Virtual Machine Contributor Roles.
+**Note**: If you do not have the required permissions, contact your Azure portal admin to create a service principal with Network Contributor and Virtual Machine Contributor Roles.
  
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/8.png)
  
 Grab all the details from the output and save them to use in the ARM template input parameters while deploying the template.
-3.1.3.	Role Assignment to Service Principal Using Azure Portal (GUI)
 
-Dynamic address objects (IP addresses) in Azure can be resolved by FortiGate Azure SDN connector/Fabric Connector, provided that the service principal is granted Network Contributor and Virtual Machine Contributor roles for the target Subscription.
-1.	Go to Azure Portal, search for “Subscriptions” and click on Subscriptions as shown below:
- 
-2.	It will open the subscriptions page, click on the target subscription where you are going to deploy the template as shown below:
- 
-3.	In your subscription page click on the Access Control (IAM),  +Add  Add role assignment as shown below:
- 
-4.	In Add role assignment page, select Role as “Network Contributor” and then select the service principal by typing the service principal name under Select, then click on Save.
- 
-5.	Repeat the above steps (3, 4) to assign “Virtual Machine Contributor” to the service principal as shown below:
- 
+#### 3.1.3.	Role Assignment to Service Principal Using Azure Portal (GUI)
 
+Dynamic address objects (IP addresses) in Azure can be resolved by FortiGate Azure SDN connector/Fabric Connector, provided that the service principal is granted **Network Contributor** and **Virtual Machine Contributor** roles for the target Subscription.
 
+1.	Go to Azure Portal, search for “**Subscriptions**” and click on **Subscriptions** as shown below:
 
-3.1.4.	Role Assignment to Service Principal Using Azure CLI 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/9.png)
 
-You can also run the following commands in the Azure CLI to assign roles to the App on the Subscription level:
-Ex: az role assignment create --assignee <App ID> --role <Role Name> --subscription <subscription name/ID>
-az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Network Contributor" --subscription "demoSubcription"
-az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Virtual Machine Contributor" --subscription "demoSubcription"
+2.	It will open the subscriptions page, click on the target **subscription** where you are going to deploy the template as shown below:
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/10.png)
+
+3.	In your subscription page click on the **Access Control (IAM) -> +Add -> Add role assignment** as shown below:
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/11.png)
+
+4.	In **Add role assignment** page, select **Role** as “**Network Contributor**” and then select the service principal by typing the service principal name under **Select**, then click on **Save**.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/12.png)
+
+5.	Repeat the above steps (3, 4) to assign “**Virtual Machine Contributor**” to the service principal as shown below:
+ 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/13.png)
+
+#### 3.1.4.	Role Assignment to Service Principal Using Azure CLI 
+
+You can also run the following commands in the **Azure CLI** to assign roles to the App on the Subscription level:
+
+**Ex:** az role assignment create --assignee <App ID> --role <Role Name> --subscription <subscriptionname/ID>
+
+> az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Network Contributor" --subscription "demoSubcription"
+
+> az role assignment create --assignee "fbc3c19f-0ce7-4XX9-aXXd-4e75f29330a3" --role "Virtual Machine Contributor" --subscription "demoSubcription"
  
  
-3.2.	Deploying the ARM Template
+### 3.2. Deploying the ARM Template
 
 1. Click on the Deploy to Azure button from this link. 
  
