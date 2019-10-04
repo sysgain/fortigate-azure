@@ -1,41 +1,26 @@
 # Lab:Fortinet FortiGate - Fabric Connectors for Azure
 
 ## Table of Contents
-	
-1.	Introduction	
-2.	Architecture Diagram	
-2.1 Network Flow Diagram	
+
+[Overview](#overview)
+
+[Pre-Requisites](#pre-requisites) 
+
+2.	Architecture Diagram		
 3.	Deploying the Demo Solution ARM Template	
-3.1 Pre-Deployment Step: Collecting the Details from Azure	
-3.1.1.	Create Service Principal for Azure AD Using Azure Portal (GUI)
-3.1.2.	Create Service Principal for Azure AD Using Azure Cloud Shell (CLI)
-3.1.3.	Role Assignment to Service Principal Using Azure Portal (GUI)	
-3.1.4.	Role Assignment to Service Principal Using Azure CLI	
-3.2.	Deploying the ARM Template	
-3.2.1.	ARM Template Input Parameters	
-3.2.2.	ARM Template Output Parameters
 4.	Configuring FortiGate	
-5	Blocking a URL Using IPv4 Policy and Fabric Connector Address	
-Changing the policy precedence	
-6.	Intrusion prevention	
-6.1.	Create an IPS senor	
-6.2.	Add the IPS sensor to the security policy allowing Internet access	
-6.3.	Test the IPS sensor	
+5.	Blocking a URL Using IPv4 Policy and Fabric Connector Address	
+6.	Intrusion prevention		
 7.	Botnet C&C IP blocking	
-7.1.	Test the Botnet C&C IP Blocking	
 8.	Cleaning Up the Demo VNET Resources	
 9.	Clean Up All Resources
-9.1.	Deleting Service Principal	
-9.1.1.	Deleting Service Principal Using the Azure Portal UI	
-9.1.2.	Deleting Service Principal Using the Azure Cloud Shell	
 10.	Connecting to the Existing Spoke VNet Resources
-10.1.	Associating Subnets to the Route Table Using Azure Portal (GUI)	
-10.2.	Associating Subnets to the Route Table Using Azure Cloud Shell (CLI)	
 
-
-## 1. Introduction
+## OverView
 
 This solution is comprised of an automated deployment template for a FortiGate solution on Azure, with a demo environment and use case baked in. Once the demo is completed, this solution allows the user to clean up the demo environment and optionally connect and protect their existing environment without the need to redeploy the FortiGate solution. This way, users get a guaranteed hands-on demo, and they also have the opportunity to keep the solution if they like it. 
+
+### Scenario and Objectives
 
 In this solution, the core capabilities of Fortinet’s FortiGate firewall, along with Fabric Connectors, are demonstrated. Fabric Connectors are software-defined network (SDN) connectors that provide integration and orchestration of Fortinet products with key SDN solutions. 
 
@@ -59,6 +44,10 @@ Fortinet FortiGate-VM firewall technology delivers complete content and network 
 **Resource groups** – This solution supports hub VNet & spoke VNets in the same resource group.
 
 **User defined routes (UDRs)** – used to force traffic destined to a spoke to be sent to an FortiGate acting as a router at the hub VNet. This will allow the spokes to connect to each other.
+
+## Pre-Requisites
+
+* Azure Portal
 
 ## 2. Architecture Diagram
 
@@ -95,30 +84,47 @@ The subscription ID is a unique alphanumeric string that identifies your Azure s
 #### 3.1.1.	Create Service Principal for Azure AD Using Azure Portal (GUI)
 
 An Azure AD application must be created to generate the Azure client ID and the corresponding Azure client secret, or Key as it is referred to in Azure. This application must be a service principal. Otherwise, the Azure SDN connector cannot read the inventory.
-Note: Before creating the service principal, you need to verify that you have the required permissions on the subscription. Make sure your subscription has the following permissions:
+
+**Note**: Before creating the service principal, you need to verify that you have the required permissions on the subscription. Make sure your subscription has the following permissions:
 
 *  Application Administrator
 *  A User with app registrations setting is set to ‘Yes’
 
 In your Azure subscription, your account must have the **Owner** role or **User Access Administrator** role.
 
-1.	Sign in to your Azure account through the Azure portal and select **Azure Active Directory > App registrations > New registration**.
+1. Using the Chrome browser, login to Azure Portal with the below details:
+
+```
+Azure Username : {{ Portal Useremail }}
+
+Azure Password : {{ Portal Password }}
+```
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/l1.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/l2.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/l3.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/l4.png)
+
+2. select **Azure Active Directory > App registrations > New registration**.
 
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/3.png)
  
-2.	Provide a name and select the **Supported account types**. Add a **Redirect URI** for the application. Select **Web** for the type of application you want to create. After setting the values, click on **Register**.
+3.	Provide a name and select the **Supported account types**. Add a **Redirect URI** for the application. Select **Web** for the type of application you want to create. After setting the values, click on **Register**.
 
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/4.png)
  
-3.	Once you register the App, the following screen appears. You need to grab the Application/Client ID as shown below:
+4.	Once you register the App, the following screen appears. You need to grab the Application/Client ID as shown below:
  
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/5.png)
 
-4.	To create the password, you will need to click on the **Certificates & secrets** then click on **+ New client secret**. Provide the needed description, select the expiry duration and click on **Add**.
+5.	To create the password, you will need to click on the **Certificates & secrets** then click on **+ New client secret**. Provide the needed description, select the expiry duration and click on **Add**.
 
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/6.png)
  
-5.	Once you click on **Add**, the client secret/password will be created and shown under the VALUE column as shown below. Copy the ***VALUE*** and keep it for future use.
+6.	Once you click on **Add**, the client secret/password will be created and shown under the VALUE column as shown below. Copy the ***VALUE*** and keep it for future use.
 
 ![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/7.png)
 
@@ -337,13 +343,13 @@ Note: You can download PuTTY here
 
 4.	After a successful login you can view following screen:	
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/37.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/38.png)
 
 **SSH instruction for Mac OS**
 
 5.	Launch the Terminal application, you can launch it from Spotlight by hitting Command + Spacebar and typing “Terminal”.
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/38.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/39.png)
 
 6.	In the command prompt, enter the following **ssh** command and hit Enter.
 
@@ -354,21 +360,21 @@ ssh demouser@fortigatepw2x4.westus2.cloudapp.azure.com -p 2222
 
 ```
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/39.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/40.png)
 
 7.	Login to the remote server by entering the password for the user account you are logging into.
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/40.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/41.png)
 
 **Note**: You can login to the workload VM using the FortiGate DNS with port 2222, as you have created a policy **(ssh-wl)**in the earlier steps to route the SSH traffic to the workload VM through the FortiGate VM.
 
 8.	Once you login to the workload VM, run the following command to access a specific URL. In this case it is **www.facebook.com**.
          
-         **wget www.facebook.com**
+         wget www.facebook.com
 
 **Note**: After login to the workload VM the commands are same for the Window OS and Mac OS.
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/40.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/42.png)
  
 You can see that you are able to access facebook.com and download the index.html file (to verify, enter the “**ls**” command and you can see index.html file, as shown in above screenshot).
 
@@ -376,57 +382,90 @@ You can control web content by blocking access to web pages containing specific 
 
 9.	Navigate to **Security Profile** -> **Web Filter**, click on **Create New**
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/41.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/43.png)
 
 10.	Provide the name of the Web Filter profile under **Name** as shown below
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/42.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/44.png)
 
 11.	Scroll down until you find **Static URL Filter** then enable **URL Filter**, click on **Create**. A New URL Filter pop-up will appear. Fill in the **URL** with ***facebook.com**. Select **Type** as Wildcard and **Action** as **Block** then click **OK** and then click **Apply** as shown below:
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/43.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/45.png)
 
-12.	You will need to update an IPv4 Policy (blocking-url-policy) to block the URL (facebook) in the workload VM. Click on Policy & Objects  IPv4 Policy then double click on blocking-url-policy enable Web Filter, select the Web Filter profile(blocking-url) you have created earlier and select Enable this policy as shown below:
+12.	You will need to update an **IPv4 Policy(blocking-url-policy)** to block the URL (facebook) in the workload VM. Click on **Policy&Objects** -> **IPv4 Policy** then double click on **blocking-url-policy** enable **Web Filter**, select the Web Filter profile**(blocking-url)** you have created earlier and select **Enable this policy** as shown below:
 
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/44.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/46.png)
 
 13.	Now, try to access the Facebook site from the workload VM again, as shown below. You will now not be able to access the Facebook web URL.
-NOTE: Move the ‘Block-Facebook’ policy to top of the list so that it will take the highest precedence if you have any similar policies. You can move the policy as shown below.
-Changing the policy precedence
+
+**NOTE**: Move the ‘Block-Facebook’ policy to top of the list so that it will take the highest precedence if you have any similar policies. You can move the policy as shown below.
+
+#### Changing the policy precedence
+
 Click on the policy you want to move (ex: ‘Block-Facebook’). Hold the left mouse button and move it to the top of the policy list.
  
-![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/45.png)
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/47.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/48.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/49.png)
  
-14.	You can view the log details in FortiGate UI by navigating to Log & Reports  Web Filter, then click on the log entry and click on Details for more information.
- 
-The above use case shows the use of FortiGate Fabric Connector for Azure. By using the FortiGate Fabric Connector for Azure (in this use case testip is the fabric connector address which is created using resource tag “firewall”), the configuration of the FortiGate’s policies is not dependent on the IP addresses of the resources connecting to it. 
+14.	You can view the log details in FortiGate UI by navigating to **Log&Reports** -> **Web Filter**, then click on the log entry and click on **Details** for more information.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/50.png)
+
+The above use case shows the use of FortiGate Fabric Connector for Azure. By using the FortiGate Fabric Connector for Azure (in this use case **testip** is the fabric connector address which is created using resource **tag “firewall”**), the configuration of the FortiGate’s policies is not dependent on the IP addresses of the resources connecting to it. 
+
 The entire environment could be moved to a new Azure location on a different continent with different public IP addresses, even for internal resources. After the move, no reconfiguration needs to take place. Everything works just as it did before the move.
 
-6.	Intrusion prevention
-The FortiOS intrusion prevention system (IPS) combines signature detection and prevention with low latency and excellent reliability. 
-With intrusion protection, you can create multiple IPS sensors, each containing a complete configuration based on signatures. Then, you can apply any IPS sensor to any security policy.
-The following use case explains how to enable IPS on the FortiGate unit by using the EICAR test file.
-In this example, you create a new IPS sensor and include a filter that detects the EICAR test file and saves a packet log when it is found.
-6.1.	Create an IPS senor
-1.	Go to Security Profiles > Intrusion Prevention. Select Create New, provide the name for new IPS sensor under Name as IPS-test 
- 
-2.	Click on +Add Signatures a pop-up will appear in that click on +Add Filter
-For Severity: select all the options (you need repeat this to select all the values 
-For Target: select server only.
-For OS: select Linux only.
-Search for Eicar.Virus.Test.File under the Name column, select it and click on Use Selected Signature as shown below.
- 
-3.	Under IPS Signatures table right click under Action and select Block as shown below.
+## 6. Intrusion prevention
 
+The FortiOS intrusion prevention system (IPS) combines signature detection and prevention with low latency and excellent reliability. 
+
+With intrusion protection, you can create multiple IPS sensors, each containing a complete configuration based on signatures. Then, you can apply any IPS sensor to any security policy.
+
+The following use case explains how to enable IPS on the FortiGate unit by using the EICAR test file.
+
+In this example, you create a new IPS sensor and include a filter that detects the EICAR test file and saves a packet log when it is found.
+
+### 6.1. Create an IPS senor
+
+1.	Go to **Security Profiles** > **Intrusion Prevention**. Select **Create New**, provide the name for new IPS sensor under **Name** as **IPS-test**
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/51.png)
  
-4.	Under IPS Signatures table right click on Packet Logging, click on Packet Logging and Select Enable as shown below
+2.	Click on **+Add Signatures** a pop-up will appear in that click on **+Add Filter**
+
+**For Severity**: select **all** the options (you need repeat this to select all the values 
+
+**For Target**: select **server** only.
+
+**For OS**: select **Linux** only.
+
+Search for **Eicar.Virus.Test.File** under the Name column, select it and click on Use Selected Signature as shown below.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/52.png)
  
-5.	Under IPS Signatures table right click on Packet Logging, click on Status and Select Enable as shown below
+3.	Under **IPS Signatures** table right click under **Action** and select **Block** as shown below.
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/53.png)
  
-6.	The IPS Signature is enabled as shown below then click OK. In the next screen click on Apply.
+4.	Under **IPS Signatures** table right click on **Packet Logging**, click on **Packet Logging** and Select **Enable** as shown below
  
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/54.png)
+
+5.	Under **IPS Signatures** table right click on **Packet Logging**, click on **Status** and Select **Enable** as shown below
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/55.png)
+
+6.	The IPS Signature is enabled as shown below then click OK. In the next screen click on **Apply**.
  
-6.2.	Add the IPS sensor to the security policy allowing Internet access
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/56.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/57.png)
+ 
+### 6.2. Add the IPS sensor to the security policy allowing Internet access
+
 1.	Go to Policy & Objects > IPv4 Policy then edit the internet-inbound-policy, Under Security Profiles enable IPS select IPS-test and click on OK
  
 2.	Make sure that the internet-inbound-policy on the top of the list as shown below. 
