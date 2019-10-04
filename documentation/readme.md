@@ -174,11 +174,21 @@ You can also run the following commands in the **Azure CLI** to assign roles to 
 
 ### 3.2. Deploying the ARM Template
 
-1. Click on the Deploy to Azure button from this link. 
- 
+1. Click on the **Deploy to Azure button** from this https://github.com/sysgain/fortigate-azure. 
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/16.png)
+
 2.	It will open a Microsoft Azure Sign In page. Enter your Azure portal credentials then a Custom deployment page appears. Fill in all the details, accept the terms and conditions and click on the Purchase button.
    
- 
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/17.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/1.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
+
+![alt text](https://github.com/sysgain/fortigate-azure/raw/master/documentation/images/15.png)
  
 After clicking on the Purchase button, the deployment starts. It will take around 8-12 mins to deploy the template. 
 3.2.1.	 ARM Template Input Parameters
